@@ -42,17 +42,20 @@ import static android.view.animation.AnimationUtils.loadAnimation;
  * @param <S> the type of the screens that serve as a {@link mortar.Blueprint} for subview. Must
  *            be annotated with {@link flow.Layout}, suitable for use with {@link flow.Layouts#createView}.
  */
-public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S> {
+public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S>, CanShowDrawer<S> {
 
-    private final static int drawerViewId = Views.generateViewId();
-    private final static int childViewId  = Views.generateViewId();
+    // Using static view ids to find and replace core layouts
+    private final static int drawerViewId  = Views.generateViewId();
+    private final static int contentViewId = Views.generateViewId();
 
     private final Context   context;
     private final ViewGroup container;
 
     /**
      * @param container the container used to host child views. Typically this is a {@link
-     *                  android.widget.FrameLayout} under the action bar.
+     *                  android.widget.FrameLayout} under the action bar. In this case
+     *                  it is designed to hold two children - main content and a navigation
+     *                  drawer.
      */
     public ScreenConductor(Context context, ViewGroup container) {
         this.context = context;
@@ -60,69 +63,85 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S> {
     }
 
     public void showScreen(S newScreen, S oldScreen, Flow.Direction direction) {
-        MortarScope myScope = Mortar.getScope(context);
-        MortarScope newChildScope = myScope.requireChild(newScreen);
+        View oldChild = getContentView();
 
-        View oldChild = getChildView();
-        View newChild;
-
-        if (oldChild != null) {
+        if (destroyOldScope(newScreen, oldChild)) {
             storeViewState(oldChild, oldScreen);
-            MortarScope oldChildScope = Mortar.getScope(oldChild.getContext());
-            if (oldChildScope.getName().equals(newScreen.getMortarScopeName())) {
-                return;
+            View newChild = createNewChildView(newScreen, contentViewId);
+
+            setAnimation(direction, oldChild, newChild);
+
+            if (oldChild != null) {
+                container.removeView(oldChild);
             }
-            oldChildScope.destroy();
+            container.addView(newChild, 0);
         }
-
-        // Create the new child.
-        Context childContext = newChildScope.createContext(context);
-        newChild = Layouts.createView(childContext, newScreen);
-        newChild.setId(childViewId);
-
-        setAnimation(direction, oldChild, newChild);
-
-        // Out with the old, in with the new.
-        if (oldChild != null) container.removeView(oldChild);
-        container.addView(newChild, 0);
     }
 
     public void showDrawer(S screen) {
-        MortarScope myScope = Mortar.getScope(context);
-        MortarScope newChildScope = myScope.requireChild(screen);
-
         View oldChild = getDrawerView();
-        View newChild;
 
+        if (destroyOldScope(screen, oldChild)) {
+            View newChild = createNewChildView(screen, drawerViewId);
+
+            if (oldChild != null) {
+                container.removeView(oldChild);
+            }
+
+            // Set some basic layout parameters so the drawer works
+            DrawerLayout.LayoutParams params = new DrawerLayout.LayoutParams(
+                context.getResources().getDimensionPixelSize(R.dimen.navigation_drawer_width),
+                ViewGroup.LayoutParams.MATCH_PARENT
+            );
+            params.gravity = Gravity.LEFT;
+            newChild.setLayoutParams(params);
+
+            container.addView(newChild, 1);
+        }
+    }
+
+    /**
+     * Destroys old child scope if it was different than the new one. Returns true
+     * if successful
+     */
+    protected boolean destroyOldScope(S screen, View oldChild) {
         if (oldChild != null) {
             MortarScope oldChildScope = Mortar.getScope(oldChild.getContext());
             if (oldChildScope.getName().equals(screen.getMortarScopeName())) {
-                return;
+                return false;
             }
             oldChildScope.destroy();
         }
-
-        // Create the new child.
-        Context childContext = newChildScope.createContext(context);
-        newChild = Layouts.createView(childContext, screen);
-        newChild.setId(drawerViewId);
-
-        // Out with the old, in with the new.
-        if (oldChild != null) container.removeView(oldChild);
-        DrawerLayout.LayoutParams params = new DrawerLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        params.gravity = Gravity.LEFT;
-        newChild.setLayoutParams(params);
-        container.addView(newChild, 1);
+        return true;
     }
 
+    /**
+     * Creates a new child View from a given screen and sets its view Id
+     */
+    protected View createNewChildView(S screen, final int viewId) {
+        MortarScope myScope = Mortar.getScope(context);
+        MortarScope newChildScope = myScope.requireChild(screen);
+        Context childContext = newChildScope.createContext(context);
+        View newChild = Layouts.createView(childContext, screen);
+        newChild.setId(viewId);
+        return newChild;
+    }
+
+    /**
+     * Store view hierarchy state into a Screen that will be pushed into
+     * the backstack of Flow
+     */
     protected void storeViewState(View view, S screen) {
         if (screen != null && screen instanceof StateBlueprint) {
             SparseArray<Parcelable> state = new SparseArray<>();
             view.saveHierarchyState(state);
-            ((StateBlueprint)screen).setViewState(state);
+            ((StateBlueprint) screen).setViewState(state);
         }
     }
 
+    /**
+     * Set animation for view transition
+     */
     protected void setAnimation(Flow.Direction direction, View oldChild, View newChild) {
         if (oldChild == null) return;
 
@@ -133,9 +152,11 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S> {
         newChild.setAnimation(loadAnimation(context, in));
     }
 
-    private View getChildView() {
-        return ButterKnife.findById(container, childViewId);
+    private View getContentView() {
+        return ButterKnife.findById(container, contentViewId);
     }
 
-    private View getDrawerView() { return ButterKnife.findById(container, drawerViewId); }
+    private View getDrawerView() {
+        return ButterKnife.findById(container, drawerViewId);
+    }
 }

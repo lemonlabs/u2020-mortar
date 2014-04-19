@@ -10,14 +10,14 @@ import android.view.View;
 import javax.inject.Inject;
 
 import co.lemonlabs.mortar.example.R;
+import co.lemonlabs.mortar.example.core.util.CanShowDrawer;
 import co.lemonlabs.mortar.example.core.util.CanShowScreen;
 import co.lemonlabs.mortar.example.core.util.ScreenConductor;
-import co.lemonlabs.mortar.example.ui.screens.DrawerScreen;
 import flow.Flow;
 import mortar.Blueprint;
 import mortar.Mortar;
 
-public class CoreView extends DrawerLayout implements CanShowScreen<Blueprint> {
+public class CoreView extends DrawerLayout implements CanShowScreen<Blueprint>, CanShowDrawer<Blueprint> {
 
     @Inject CorePresenter.Presenter presenter;
 
@@ -51,7 +51,10 @@ public class CoreView extends DrawerLayout implements CanShowScreen<Blueprint> {
     @Override
     public void showScreen(Blueprint screen, Blueprint oldScreen, Flow.Direction direction) {
         screenMaestro.showScreen(screen, oldScreen, direction);
-        screenMaestro.showDrawer(new DrawerScreen());
+    }
+
+    @Override public void showDrawer(Blueprint screen) {
+        screenMaestro.showDrawer(screen);
     }
 
     public void initNavigationDrawer() {
@@ -86,4 +89,5 @@ public class CoreView extends DrawerLayout implements CanShowScreen<Blueprint> {
     public ActionBarDrawerToggle getDrawerToggle() {
         return drawerToggle;
     }
+
 }

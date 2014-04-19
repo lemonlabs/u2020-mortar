@@ -9,6 +9,7 @@ import javax.inject.Singleton;
 import co.lemonlabs.mortar.example.U2020Module;
 import co.lemonlabs.mortar.example.core.android.ActionBarPresenter;
 import co.lemonlabs.mortar.example.core.util.FlowOwner;
+import co.lemonlabs.mortar.example.ui.screens.DrawerScreen;
 import co.lemonlabs.mortar.example.ui.screens.GalleryScreen;
 import dagger.Provides;
 import flow.Flow;
@@ -61,13 +62,12 @@ public class CorePresenter implements Blueprint {
         }
 
         @Override
-        public void showScreen(Blueprint newScreen, Blueprint oldScreen, Flow.Direction direction) {
-            super.showScreen(newScreen, oldScreen, direction);
-        }
-
-        @Override
         protected Blueprint getFirstScreen() {
             return new GalleryScreen();
+        }
+
+        @Override protected Blueprint getDrawerScreen() {
+            return new DrawerScreen();
         }
 
     }
