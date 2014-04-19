@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
@@ -23,6 +22,7 @@ import flow.Flow;
 import mortar.Mortar;
 import mortar.MortarActivityScope;
 import mortar.MortarScope;
+import timber.log.Timber;
 
 import static android.view.MenuItem.SHOW_AS_ACTION_ALWAYS;
 
@@ -47,7 +47,6 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
 
         Mortar.inject(this, this);
 
-        actionBarPresenter.setConfig(new ActionBarPresenter.Config(true, true, getString(R.string.application_name), null));
         actionBarPresenter.takeView(this);
 
         ViewGroup container = appContainer.get(this, U2020App.get(this));
@@ -56,9 +55,8 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
         coreView = ButterKnife.findById(this, R.id.drawer_layout);
 
         flow = coreView.getFlow();
-        drawerToggle = coreView.getDrawerToggle();
 
-        drawerPresenter.setConfig(new DrawerPresenter.Config(true, DrawerLayout.LOCK_MODE_UNLOCKED));
+        drawerToggle = coreView.getDrawerToggle();
         drawerPresenter.takeView(this);
     }
 
@@ -135,11 +133,13 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
 
     @Override
     public void setDrawerIndicatorEnabled(boolean enabled) {
+        Timber.i("setDrawerIndicator: " + enabled);
         drawerToggle.setDrawerIndicatorEnabled(enabled);
     }
 
     @Override
     public void setDrawerLockMode(int lockMode) {
+        Timber.i("setDrawerLockMode: " + lockMode);
         coreView.setDrawerLockMode(lockMode);
     }
 
