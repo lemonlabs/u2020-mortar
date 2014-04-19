@@ -122,9 +122,9 @@ public class GalleryScreen implements StateBlueprint {
             });
 
             actionBar.setConfig(new ActionBarPresenter.Config(true, true, "U2020",
-                new ActionBarPresenter.MenuAction("Go to Stub", new Action0() {
+                new ActionBarPresenter.MenuAction("Blaze it", new Action0() {
                     @Override public void call() {
-                        flow.goTo(new StubScreen());
+                        flow.goTo(new StubScreen(false, 420));
                     }
                 })
             ));

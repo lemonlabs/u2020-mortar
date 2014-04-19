@@ -5,12 +5,14 @@ import android.os.Bundle;
 import android.widget.ArrayAdapter;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import co.lemonlabs.mortar.example.R;
 import co.lemonlabs.mortar.example.core.CorePresenter;
 import co.lemonlabs.mortar.example.ui.views.DrawerView;
 import dagger.Provides;
+import flow.Flow;
 import flow.Layout;
 import mortar.Blueprint;
 import mortar.ViewPresenter;
@@ -39,7 +41,7 @@ public class DrawerScreen implements Blueprint {
 
         public Module() {}
 
-        @Provides ArrayAdapter<String> provideAdapter(Context context) {
+        @Provides @Named("drawer") ArrayAdapter<String> provideAdapter(Context context) {
             return new ArrayAdapter<>(
                 context,
                 android.R.layout.simple_list_item_activated_1,
@@ -53,9 +55,11 @@ public class DrawerScreen implements Blueprint {
     @Singleton
     public static class Presenter extends ViewPresenter<DrawerView> {
 
+        private final Flow                 flow;
         private final ArrayAdapter<String> adapter;
 
-        @Inject Presenter(ArrayAdapter<String> adapter) {
+        @Inject Presenter(Flow flow, @Named("drawer") ArrayAdapter<String> adapter) {
+            this.flow = flow;
             this.adapter = adapter;
         }
 
@@ -64,6 +68,10 @@ public class DrawerScreen implements Blueprint {
             super.onLoad(savedInstanceState);
             if (getView() == null) return;
             getView().setListAdapter(adapter);
+        }
+
+        public void goToScreenAtPosition(int position) {
+            flow.replaceTo(position == 0 ? new GalleryScreen() : new StubScreen(true, position));
         }
     }
 }

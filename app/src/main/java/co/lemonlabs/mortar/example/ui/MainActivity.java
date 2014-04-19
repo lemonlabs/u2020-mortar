@@ -22,7 +22,6 @@ import flow.Flow;
 import mortar.Mortar;
 import mortar.MortarActivityScope;
 import mortar.MortarScope;
-import timber.log.Timber;
 
 import static android.view.MenuItem.SHOW_AS_ACTION_ALWAYS;
 
@@ -133,13 +132,11 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
 
     @Override
     public void setDrawerIndicatorEnabled(boolean enabled) {
-        Timber.i("setDrawerIndicator: " + enabled);
         drawerToggle.setDrawerIndicatorEnabled(enabled);
     }
 
     @Override
     public void setDrawerLockMode(int lockMode) {
-        Timber.i("setDrawerLockMode: " + lockMode);
         coreView.setDrawerLockMode(lockMode);
     }
 

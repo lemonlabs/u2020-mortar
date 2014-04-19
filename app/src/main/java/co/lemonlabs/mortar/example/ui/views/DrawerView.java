@@ -46,6 +46,7 @@ public class DrawerView extends ListView {
 
         if (getParent() != null && getParent() instanceof DrawerLayout) {
             ((CoreView) getParent()).closeDrawer(this);
+            presenter.goToScreenAtPosition(position);
         }
     }
 

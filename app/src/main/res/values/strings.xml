@@ -5,10 +5,10 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <array name="drawer_items">
-        <item>Section 1</item>
-        <item>Section 2</item>
-        <item>Section 3</item>
-        <item>Section 4</item>
-        <item>Section 5</item>
+        <item>Gallery</item>
+        <item>Stub Screen 1</item>
+        <item>Stub Screen 2</item>
+        <item>Stub Screen 3</item>
+        <item>Stub Screen 4</item>
     </array>
 </resources>

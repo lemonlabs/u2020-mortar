@@ -7,11 +7,11 @@
     android:background="@android:color/holo_red_light">
 
     <TextView
+        android:id="@+id/stub_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        android:textSize="30sp"
-        android:text="STUB SCREEN"/>
+        android:textSize="30sp"/>
 
 </co.lemonlabs.mortar.example.ui.views.StubView>
