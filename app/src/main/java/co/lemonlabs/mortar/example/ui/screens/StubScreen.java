@@ -12,10 +12,13 @@ import co.lemonlabs.mortar.example.core.CorePresenter;
 import co.lemonlabs.mortar.example.core.android.ActionBarPresenter;
 import co.lemonlabs.mortar.example.core.android.DrawerPresenter;
 import co.lemonlabs.mortar.example.ui.views.StubView;
+import co.lemonlabs.mortar.example.ui.views.data.ExamplePopupData;
 import dagger.Provides;
 import flow.Layout;
 import mortar.Blueprint;
+import mortar.PopupPresenter;
 import mortar.ViewPresenter;
+import rx.util.functions.Action0;
 
 @Layout(R.layout.stub)
 public class StubScreen implements Blueprint {
@@ -68,10 +71,11 @@ public class StubScreen implements Blueprint {
     @Singleton
     public static class Presenter extends ViewPresenter<StubView> {
 
-        private final ActionBarPresenter actionBar;
-        private final DrawerPresenter    drawer;
-        private final boolean            hasDrawer;
-        private final String             stubText;
+        private final ActionBarPresenter                        actionBar;
+        private final DrawerPresenter                           drawer;
+        private final boolean                                   hasDrawer;
+        private final String                                    stubText;
+        private final PopupPresenter<ExamplePopupData, Boolean> examplePopupPresenter;
 
         @Inject
         Presenter(ActionBarPresenter actionBar, DrawerPresenter drawer, @Named("stub") boolean hasDrawer, @Named("stub") String stubText) {
@@ -79,6 +83,11 @@ public class StubScreen implements Blueprint {
             this.drawer = drawer;
             this.hasDrawer = hasDrawer;
             this.stubText = stubText;
+            this.examplePopupPresenter = new PopupPresenter<ExamplePopupData, Boolean>() {
+                @Override protected void onPopupResult(Boolean confirmed) {
+                    Presenter.this.getView().showToast(confirmed ? "Just did that!" : "If you say so...");
+                }
+            };
         }
 
         @Override
@@ -86,12 +95,30 @@ public class StubScreen implements Blueprint {
             super.onLoad(savedInstanceState);
             if (getView() == null) return;
 
-            actionBar.setConfig(new ActionBarPresenter.Config(true, true, hasDrawer ? "Stub with drawer" : "Stub", null));
+            actionBar.setConfig(new ActionBarPresenter.Config(
+                true,
+                true,
+                hasDrawer ? "Stub with drawer" : "Stub",
+                new ActionBarPresenter.MenuAction("Alert", new Action0() {
+                    @Override public void call() {
+                        examplePopupPresenter.show(new ExamplePopupData("This is an example of a Popup Presenter"));
+                    }
+                })
+            ));
+
             if (!hasDrawer) {
                 drawer.setConfig(new DrawerPresenter.Config(false, DrawerLayout.LOCK_MODE_LOCKED_CLOSED));
             }
 
             getView().setStubText(stubText);
+
+            examplePopupPresenter.takeView(getView().getExamplePopup());
+        }
+
+        @Override
+        public void dropView(StubView view) {
+            examplePopupPresenter.dropView(getView().getExamplePopup());
+            super.dropView(view);
         }
     }
 }
