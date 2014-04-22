@@ -69,7 +69,9 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S>, C
             storeViewState(oldChild, oldScreen);
             View newChild = createNewChildView(newScreen, contentViewId);
 
-            setAnimation(direction, oldChild, newChild);
+            if (direction != Flow.Direction.REPLACE) {
+                setAnimation(direction, oldChild, newChild);
+            }
 
             if (oldChild != null) {
                 container.removeView(oldChild);

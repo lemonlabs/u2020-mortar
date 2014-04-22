@@ -54,7 +54,7 @@ android {
 dependencies {
 
     compile 'com.squareup.mortar:mortar:0.14'
-    compile 'com.squareup.flow:flow:0.5'
+    compile 'com.squareup.flow:flow:0.6'
     compile 'com.netflix.rxjava:rxjava-core:0.16.1'
     compile 'com.netflix.rxjava:rxjava-android:0.16.1'
 
