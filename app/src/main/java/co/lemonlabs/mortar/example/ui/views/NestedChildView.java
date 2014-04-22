@@ -4,7 +4,7 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.animation.LinearInterpolator;
+import android.view.animation.BounceInterpolator;
 import android.widget.FrameLayout;
 
 import butterknife.ButterKnife;
@@ -14,6 +14,8 @@ import mortar.Mortar;
 public class NestedChildView extends FrameLayout {
 
     private NestedScreen.ChildPresenter presenter;
+
+    private ObjectAnimator animator;
 
     public NestedChildView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -29,6 +31,7 @@ public class NestedChildView extends FrameLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
         ButterKnife.inject(this);
+        createAnimation();
     }
 
     @Override
@@ -37,12 +40,22 @@ public class NestedChildView extends FrameLayout {
         presenter.dropView(this);
     }
 
-    public void startAnimation() {
-        ObjectAnimator animator = ObjectAnimator.ofFloat(this, "rotation", 0, 360);
-        animator.setDuration(3500);
-        animator.setInterpolator(new LinearInterpolator());
+    private void createAnimation() {
+        animator = ObjectAnimator.ofFloat(this, "rotation", 360);
+        animator.setDuration(3600);
+        animator.setInterpolator(new BounceInterpolator());
         animator.setRepeatMode(ValueAnimator.RESTART);
         animator.setRepeatCount(ValueAnimator.INFINITE);
-        animator.start();
+    }
+
+    public void toggleAnimation() {
+        if (animator != null) {
+            if (animator.isRunning()) {
+                animator.end();
+            } else {
+                animator.start();
+            }
+        }
     }
 }
+

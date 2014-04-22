@@ -13,6 +13,7 @@ import co.lemonlabs.mortar.example.ui.views.NestedView;
 import flow.Layout;
 import mortar.Blueprint;
 import mortar.ViewPresenter;
+import rx.util.functions.Action0;
 
 @Layout(R.layout.nested)
 public class NestedScreen implements Blueprint {
@@ -57,7 +58,22 @@ public class NestedScreen implements Blueprint {
             super.onLoad(savedInstanceState);
             if (getView() == null) return;
 
-            actionBar.setConfig(new ActionBarPresenter.Config(true, true, "Nested Presenters", null));
+            actionBar.setConfig(new ActionBarPresenter.Config(
+                true,
+                true,
+                "Nested Presenters",
+                new ActionBarPresenter.MenuAction("Animate", new Action0() {
+                    @Override public void call() {
+                        if (getView() != null) {
+                            toggleChildAnimation();
+                        }
+                    }
+                })
+            ));
+        }
+
+        public void toggleChildAnimation() {
+            childPresenter.toggleAnimation();
         }
 
         public ChildPresenter getChildPresenter() {
@@ -75,8 +91,11 @@ public class NestedScreen implements Blueprint {
         public void onLoad(Bundle savedInstanceState) {
             super.onLoad(savedInstanceState);
             if (getView() == null) return;
+            toggleAnimation();
+        }
 
-            getView().startAnimation();
+        public void toggleAnimation() {
+            getView().toggleAnimation();
         }
     }
 }
