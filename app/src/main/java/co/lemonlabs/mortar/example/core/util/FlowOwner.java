@@ -18,6 +18,9 @@ package co.lemonlabs.mortar.example.core.util;
 import android.os.Bundle;
 import android.view.View;
 
+import java.util.List;
+
+import co.lemonlabs.mortar.example.util.Lists;
 import flow.Backstack;
 import flow.Flow;
 import flow.Parcer;
@@ -73,15 +76,10 @@ public abstract class FlowOwner<S extends Blueprint, V extends View & CanShowScr
 
         S oldScreen = null;
         if (flowDirection == Flow.Direction.FORWARD && backstack.size() > 1) {
-            int i = 0;
-            for (Backstack.Entry e : backstack) {
-                if (i == 1) {
-                    //noinspection unchecked
-                    oldScreen = (S) e.getScreen();
-                    break;
-                }
-                i++;
-            }
+            List<Backstack.Entry> entries = Lists.newArrayList(backstack);
+            Backstack.Entry oldEntry = entries.get(entries.size() - 1);
+            //noinspection unchecked
+            oldScreen = (S) oldEntry.getScreen();
         }
 
         showScreen(newScreen, oldScreen, flowDirection);
