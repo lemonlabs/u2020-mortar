@@ -19,6 +19,16 @@ def buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'", TimeZone.getTimeZone(
 def isTravis = "true".equals(System.getenv("TRAVIS"))
 def preDexEnabled = "true".equals(System.getProperty("pre-dex", "true"))
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.9.+'
+        classpath 'com.jakewharton.hugo:hugo-plugin:1.0.+'
+        classpath 'com.stanfy.spoon:spoon-gradle-plugin:0.9.6'
+    }
+}
 
 android {
     compileSdkVersion 19
@@ -33,6 +43,11 @@ android {
 
         buildConfigField "String", "GIT_SHA", "\"${gitSha}\""
         buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
+        buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
+
+        testPackageName "co.lemonlabs.mortar.tests"
+        testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
+
     }
     dexOptions {
         // Skip pre-dexing when running on Travis CI or when disabled via -Dpre-dex=false.
@@ -111,7 +126,7 @@ idea {
 
 android.applicationVariants.all { variant ->
     def apk = variant.outputFile
-    def newName = "TravelBird-${variant.name}-v${project.versionName}.apk"
+    def newName = "ll-mortar-${variant.name}-v${project.versionName}.apk"
 
     variant.outputFile = new File(apk.parentFile, newName)
 }
