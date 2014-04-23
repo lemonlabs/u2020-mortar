@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="start"
-    android:background="#454545">
+    android:background="#454545"
+    android:contentDescription="drawerList">
 
 </co.lemonlabs.mortar.example.ui.views.DrawerView>
