@@ -7,6 +7,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public final class Views {
 
+    private Views() {}
+
     private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
 
     /**
@@ -17,7 +19,7 @@ public final class Views {
      */
     public static int generateViewId() {
         if (Build.VERSION.SDK_INT < 17) {
-            for (;;) {
+            for (; ; ) {
                 final int result = sNextGeneratedId.get();
                 // aapt-generated IDs have the high byte nonzero; clamp to the range under that.
                 int newValue = result + 1;

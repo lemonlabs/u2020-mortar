@@ -5,7 +5,9 @@ import java.util.Collection;
 import java.util.Iterator;
 
 
-public class Lists {
+public final class Lists {
+
+    private Lists() {}
 
     public static <E> ArrayList<E> newArrayList(Iterable<? extends E> elements) {
         //noinspection unchecked
