@@ -2,8 +2,6 @@ package co.lemonlabs.mortar.tests;
 
 import android.test.suitebuilder.annotation.SmallTest;
 
-import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
-
 import co.lemonlabs.mortar.example.R;
 
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onData;
@@ -11,7 +9,6 @@ import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withContentDescription;
-import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.core.IsAnything.anything;
@@ -24,6 +21,11 @@ public class FlowTest extends BaseTest {
         super.setUp();
     }
 
+    /**
+     * No useful things are actually tested. This is just for checking if configuration works
+     *
+     * @throws Throwable
+     */
     public void testBasicNavigation() throws Throwable {
         String tag;
 
@@ -37,8 +39,6 @@ public class FlowTest extends BaseTest {
         onView(withId(android.R.id.home)).perform(click());
         screenshot(tag);
 
-        onView(withId(R.id.gallery_progress)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
-
         tag = "3. Click on Action Bar Toggle should open Navigation Drawer";
         onView(withId(android.R.id.home)).perform(click());
         screenshot(tag);
@@ -47,7 +47,6 @@ public class FlowTest extends BaseTest {
         onData(anything()).inAdapterView(withContentDescription("drawerList")).atPosition(1).perform(click());
         screenshot(tag);
     }
-
 
 
 }
