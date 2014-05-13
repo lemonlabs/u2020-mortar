@@ -76,8 +76,8 @@ public abstract class FlowOwner<S extends Blueprint, V extends View & CanShowScr
 
         S oldScreen = null;
         if (flowDirection == Flow.Direction.FORWARD && backstack.size() > 1) {
-            List<Backstack.Entry> entries = Lists.newArrayList(backstack);
-            Backstack.Entry oldEntry = entries.get(entries.size() - 1);
+            List<Backstack.Entry> entries = Lists.newArrayList(backstack.reverseIterator());
+            Backstack.Entry oldEntry = entries.get(entries.size() - 2);
             //noinspection unchecked
             oldScreen = (S) oldEntry.getScreen();
         }
