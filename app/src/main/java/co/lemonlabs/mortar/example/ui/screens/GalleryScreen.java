@@ -18,6 +18,7 @@ import co.lemonlabs.mortar.example.core.CorePresenter;
 import co.lemonlabs.mortar.example.core.StateBlueprint;
 import co.lemonlabs.mortar.example.core.android.ActionBarPresenter;
 import co.lemonlabs.mortar.example.core.android.DrawerPresenter;
+import co.lemonlabs.mortar.example.core.anim.Transition;
 import co.lemonlabs.mortar.example.data.GalleryDatabase;
 import co.lemonlabs.mortar.example.data.api.Section;
 import co.lemonlabs.mortar.example.data.api.model.Image;
@@ -32,9 +33,16 @@ import rx.Subscription;
 import rx.util.functions.Action0;
 
 @Layout(R.layout.gallery_view)
+@Transition({R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right})
 public class GalleryScreen implements StateBlueprint {
 
-    private SparseArray<Parcelable> viewState;
+    private final boolean                 hasDrawer;
+    private       SparseArray<Parcelable> viewState;
+    private       int[]                   transitions;
+
+    public GalleryScreen(boolean hasDrawer) {
+        this.hasDrawer = hasDrawer;
+    }
 
     @Override
     public String getMortarScopeName() {
@@ -43,12 +51,18 @@ public class GalleryScreen implements StateBlueprint {
 
     @Override
     public Object getDaggerModule() {
-        return new Module(viewState);
+        return new Module(viewState, hasDrawer);
     }
 
     @Override public void setViewState(SparseArray<Parcelable> viewState) {
         this.viewState = viewState;
     }
+
+    @Override public void setTransitions(int[] transitions) {
+        this.transitions = transitions;
+    }
+
+    @Override public int[] getTransitions() { return transitions; }
 
     @dagger.Module(
         injects = GalleryView.class,
@@ -59,8 +73,12 @@ public class GalleryScreen implements StateBlueprint {
     public static class Module {
 
         private final SparseArray<Parcelable> viewState;
+        private final boolean                 hasDrawer;
 
-        public Module(SparseArray<Parcelable> viewState) {this.viewState = viewState;}
+        public Module(SparseArray<Parcelable> viewState, boolean hasDrawer) {
+            this.viewState = viewState;
+            this.hasDrawer = hasDrawer;
+        }
 
         @Provides GalleryAdapter providesGalleryAdapter(Context context, Picasso picasso) {
             return new GalleryAdapter(context, picasso);
@@ -75,6 +93,10 @@ public class GalleryScreen implements StateBlueprint {
             return viewState;
         }
 
+        @Provides boolean providesHasDrawer() { return hasDrawer; }
+
+        ;
+
     }
 
     @Singleton
@@ -88,11 +110,12 @@ public class GalleryScreen implements StateBlueprint {
         private final GalleryAdapter          adapter;
         private final Section                 section;
         private final SparseArray<Parcelable> viewState;
+        private final boolean                 hasDrawer;
 
         private Subscription request;
 
         @Inject
-        Presenter(ActionBarPresenter actionBar, DrawerPresenter drawer, GalleryDatabase galleryDatabase, Flow flow, GalleryAdapter adapter, Section section, SparseArray<Parcelable> viewState) {
+        Presenter(ActionBarPresenter actionBar, DrawerPresenter drawer, GalleryDatabase galleryDatabase, Flow flow, GalleryAdapter adapter, Section section, SparseArray<Parcelable> viewState, boolean hasDrawer) {
             this.actionBar = actionBar;
             this.drawer = drawer;
             this.galleryDatabase = galleryDatabase;
@@ -100,6 +123,7 @@ public class GalleryScreen implements StateBlueprint {
             this.adapter = adapter;
             this.section = section;
             this.viewState = viewState;
+            this.hasDrawer = hasDrawer;
         }
 
         @Override
@@ -129,7 +153,11 @@ public class GalleryScreen implements StateBlueprint {
                 })
             ));
 
-            drawer.setConfig(new DrawerPresenter.Config(true, DrawerLayout.LOCK_MODE_UNLOCKED));
+            if (hasDrawer) {
+                drawer.setConfig(new DrawerPresenter.Config(true, DrawerLayout.LOCK_MODE_UNLOCKED));
+            } else {
+                drawer.setConfig(new DrawerPresenter.Config(false, DrawerLayout.LOCK_MODE_LOCKED_CLOSED));
+            }
         }
 
         @Override

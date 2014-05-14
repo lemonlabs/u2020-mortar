@@ -7,9 +7,6 @@
     <array name="drawer_items">
         <item>Gallery</item>
         <item>Nested example</item>
-        <item>Stub Screen 1</item>
-        <item>Stub Screen 2</item>
-        <item>Stub Screen 3</item>
-        <item>Stub Screen 4</item>
+        <item>Stub Screen</item>
     </array>
 </resources>

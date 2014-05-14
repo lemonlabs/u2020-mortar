@@ -9,4 +9,7 @@ public interface StateBlueprint extends Blueprint {
 
     public void setViewState(SparseArray<Parcelable> viewState);
 
+    public void setTransitions(int[] transitions);
+    public int[] getTransitions();
+
 }

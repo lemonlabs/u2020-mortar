@@ -1,7 +1,9 @@
 package co.lemonlabs.mortar.example.ui.screens;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.widget.DrawerLayout;
+import android.util.SparseArray;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -9,22 +11,26 @@ import javax.inject.Singleton;
 
 import co.lemonlabs.mortar.example.R;
 import co.lemonlabs.mortar.example.core.CorePresenter;
+import co.lemonlabs.mortar.example.core.StateBlueprint;
 import co.lemonlabs.mortar.example.core.android.ActionBarPresenter;
 import co.lemonlabs.mortar.example.core.android.DrawerPresenter;
+import co.lemonlabs.mortar.example.core.anim.Transition;
 import co.lemonlabs.mortar.example.ui.views.StubView;
 import co.lemonlabs.mortar.example.ui.views.data.ExamplePopupData;
 import dagger.Provides;
+import flow.Flow;
 import flow.Layout;
-import mortar.Blueprint;
 import mortar.PopupPresenter;
 import mortar.ViewPresenter;
 import rx.util.functions.Action0;
 
 @Layout(R.layout.stub)
-public class StubScreen implements Blueprint {
+@Transition({R.anim.slide_in_bot, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bot})
+public class StubScreen implements StateBlueprint {
 
     private final boolean hasDrawer;
     private final int     position;
+    private       int[]   transitions;
 
     public StubScreen(boolean hasDrawer, int position) {
         this.hasDrawer = hasDrawer;
@@ -39,6 +45,18 @@ public class StubScreen implements Blueprint {
     @Override
     public Object getDaggerModule() {
         return new Module(hasDrawer, position);
+    }
+
+    @Override public void setViewState(SparseArray<Parcelable> viewState) {
+        // no view state to be stored
+    }
+
+    @Override public void setTransitions(int[] transitions) {
+        this.transitions = transitions;
+    }
+
+    @Override public int[] getTransitions() {
+        return transitions;
     }
 
     @dagger.Module(
@@ -71,14 +89,16 @@ public class StubScreen implements Blueprint {
     @Singleton
     public static class Presenter extends ViewPresenter<StubView> {
 
-        private final ActionBarPresenter                        actionBar;
+        private final Flow flow;
+        private final ActionBarPresenter actionBar;
         private final DrawerPresenter                           drawer;
         private final boolean                                   hasDrawer;
         private final String                                    stubText;
         private final PopupPresenter<ExamplePopupData, Boolean> examplePopupPresenter;
 
         @Inject
-        Presenter(ActionBarPresenter actionBar, DrawerPresenter drawer, @Named("stub") boolean hasDrawer, @Named("stub") String stubText) {
+        Presenter(Flow flow, ActionBarPresenter actionBar, DrawerPresenter drawer, @Named("stub") boolean hasDrawer, @Named("stub") String stubText) {
+            this.flow = flow;
             this.actionBar = actionBar;
             this.drawer = drawer;
             this.hasDrawer = hasDrawer;
@@ -119,6 +139,10 @@ public class StubScreen implements Blueprint {
         public void dropView(StubView view) {
             examplePopupPresenter.dropView(getView().getExamplePopup());
             super.dropView(view);
+        }
+
+        public void goToGallery() {
+            flow.goTo(new GalleryScreen(false));
         }
     }
 }

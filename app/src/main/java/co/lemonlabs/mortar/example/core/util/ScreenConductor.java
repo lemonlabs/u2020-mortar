@@ -26,14 +26,13 @@ import android.view.ViewGroup;
 import butterknife.ButterKnife;
 import co.lemonlabs.mortar.example.R;
 import co.lemonlabs.mortar.example.core.StateBlueprint;
+import co.lemonlabs.mortar.example.core.anim.Transitions;
 import co.lemonlabs.mortar.example.util.Views;
 import flow.Flow;
 import flow.Layouts;
 import mortar.Blueprint;
 import mortar.Mortar;
 import mortar.MortarScope;
-
-import static android.view.animation.AnimationUtils.loadAnimation;
 
 /**
  * A conductor that can swap subviews within a container view.
@@ -69,15 +68,33 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S>, C
             storeViewState(oldChild, oldScreen);
             View newChild = createNewChildView(newScreen, contentViewId);
 
-            if (direction != Flow.Direction.REPLACE) {
-                setAnimation(direction, oldChild, newChild);
-            }
 
             if (oldChild != null) {
+                switch (direction) {
+                    case FORWARD:
+                        // Load animations from annotations, store them into backstack and set them to views
+                        storeTransitions(oldScreen, newScreen);
+                        oldChild.setAnimation(Transitions.pushOut(context, newScreen));
+                        newChild.setAnimation(Transitions.pushIn(context, newScreen));
+                        break;
+                    case BACKWARD:
+                        if (newScreen instanceof StateBlueprint) {
+                            // Try to load animations from a screen and set them
+                            int[] transitions = ((StateBlueprint) newScreen).getTransitions();
+                            newChild.setAnimation(Transitions.popIn(context, transitions));
+                            oldChild.setAnimation(Transitions.popOut(context, transitions));
+                        }
+                        break;
+                    case REPLACE:
+                        // no animations
+                        break;
+                }
+
                 container.removeView(oldChild);
             }
             container.addView(newChild, 0);
         }
+
     }
 
     public void showDrawer(S screen) {
@@ -142,16 +159,15 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S>, C
     }
 
     /**
-     * Set animation for view transition
+     * Store transitions that were used from one screen to another
+     *
+     * @param oldScreen
+     * @param newScreen
      */
-    protected void setAnimation(Flow.Direction direction, View oldChild, View newChild) {
-        if (oldChild == null) return;
-
-        int out = direction == Flow.Direction.FORWARD ? R.anim.slide_out_left : R.anim.slide_out_right;
-        int in = direction == Flow.Direction.FORWARD ? R.anim.slide_in_right : R.anim.slide_in_left;
-
-        oldChild.setAnimation(loadAnimation(context, out));
-        newChild.setAnimation(loadAnimation(context, in));
+    private void storeTransitions(S oldScreen, S newScreen) {
+        if (oldScreen != null && oldScreen instanceof StateBlueprint) {
+            ((StateBlueprint) oldScreen).setTransitions(Transitions.getTransitionResources(newScreen.getClass()));
+        }
     }
 
     private View getContentView() {
