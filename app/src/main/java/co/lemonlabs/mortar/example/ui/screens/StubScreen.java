@@ -128,6 +128,8 @@ public class StubScreen implements StateBlueprint {
 
             if (!hasDrawer) {
                 drawer.setConfig(new DrawerPresenter.Config(false, DrawerLayout.LOCK_MODE_LOCKED_CLOSED));
+            } else {
+                drawer.setConfig(new DrawerPresenter.Config(true, DrawerLayout.LOCK_MODE_UNLOCKED));
             }
 
             getView().setStubText(stubText);
