@@ -12,6 +12,7 @@ import javax.inject.Singleton;
 import co.lemonlabs.mortar.example.R;
 import co.lemonlabs.mortar.example.core.CorePresenter;
 import co.lemonlabs.mortar.example.core.StateBlueprint;
+import co.lemonlabs.mortar.example.core.TransitionScreen;
 import co.lemonlabs.mortar.example.core.android.ActionBarPresenter;
 import co.lemonlabs.mortar.example.core.android.DrawerPresenter;
 import co.lemonlabs.mortar.example.core.anim.Transition;
@@ -26,12 +27,10 @@ import rx.util.functions.Action0;
 
 @Layout(R.layout.stub)
 @Transition({R.anim.slide_in_bot, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bot})
-public class StubScreen implements StateBlueprint {
+public class StubScreen extends TransitionScreen implements StateBlueprint  {
 
     private final boolean hasDrawer;
     private final int     position;
-    private       int[]   transitions;
-
     public StubScreen(boolean hasDrawer, int position) {
         this.hasDrawer = hasDrawer;
         this.position = position;
@@ -49,14 +48,6 @@ public class StubScreen implements StateBlueprint {
 
     @Override public void setViewState(SparseArray<Parcelable> viewState) {
         // no view state to be stored
-    }
-
-    @Override public void setTransitions(int[] transitions) {
-        this.transitions = transitions;
-    }
-
-    @Override public int[] getTransitions() {
-        return transitions;
     }
 
     @dagger.Module(

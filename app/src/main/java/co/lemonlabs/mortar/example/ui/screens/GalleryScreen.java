@@ -16,6 +16,7 @@ import javax.inject.Singleton;
 import co.lemonlabs.mortar.example.R;
 import co.lemonlabs.mortar.example.core.CorePresenter;
 import co.lemonlabs.mortar.example.core.StateBlueprint;
+import co.lemonlabs.mortar.example.core.TransitionScreen;
 import co.lemonlabs.mortar.example.core.android.ActionBarPresenter;
 import co.lemonlabs.mortar.example.core.android.DrawerPresenter;
 import co.lemonlabs.mortar.example.core.anim.Transition;
@@ -34,11 +35,10 @@ import rx.util.functions.Action0;
 
 @Layout(R.layout.gallery_view)
 @Transition({R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right})
-public class GalleryScreen implements StateBlueprint {
+public class GalleryScreen extends TransitionScreen implements StateBlueprint {
 
     private final boolean                 hasDrawer;
     private       SparseArray<Parcelable> viewState;
-    private       int[]                   transitions;
 
     public GalleryScreen(boolean hasDrawer) {
         this.hasDrawer = hasDrawer;
@@ -57,12 +57,6 @@ public class GalleryScreen implements StateBlueprint {
     @Override public void setViewState(SparseArray<Parcelable> viewState) {
         this.viewState = viewState;
     }
-
-    @Override public void setTransitions(int[] transitions) {
-        this.transitions = transitions;
-    }
-
-    @Override public int[] getTransitions() { return transitions; }
 
     @dagger.Module(
         injects = GalleryView.class,

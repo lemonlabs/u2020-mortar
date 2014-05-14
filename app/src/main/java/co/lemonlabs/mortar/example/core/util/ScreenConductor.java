@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import butterknife.ButterKnife;
 import co.lemonlabs.mortar.example.R;
 import co.lemonlabs.mortar.example.core.StateBlueprint;
+import co.lemonlabs.mortar.example.core.TransitionScreen;
 import co.lemonlabs.mortar.example.core.anim.Transitions;
 import co.lemonlabs.mortar.example.util.Views;
 import flow.Flow;
@@ -78,9 +79,9 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S>, C
                         newChild.setAnimation(Transitions.pushIn(context, newScreen));
                         break;
                     case BACKWARD:
-                        if (newScreen instanceof StateBlueprint) {
+                        if (newScreen instanceof TransitionScreen) {
                             // Try to load animations from a screen and set them
-                            int[] transitions = ((StateBlueprint) newScreen).getTransitions();
+                            int[] transitions = ((TransitionScreen) newScreen).getTransitions();
                             newChild.setAnimation(Transitions.popIn(context, transitions));
                             oldChild.setAnimation(Transitions.popOut(context, transitions));
                         }
@@ -165,8 +166,8 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S>, C
      * @param newScreen
      */
     private void storeTransitions(S oldScreen, S newScreen) {
-        if (oldScreen != null && oldScreen instanceof StateBlueprint) {
-            ((StateBlueprint) oldScreen).setTransitions(Transitions.getTransitionResources(newScreen.getClass()));
+        if (oldScreen != null && oldScreen instanceof TransitionScreen) {
+            ((TransitionScreen) oldScreen).setTransitions(Transitions.getTransitionResources(newScreen.getClass()));
         }
     }
 
