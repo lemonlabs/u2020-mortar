@@ -3,7 +3,6 @@ package co.lemonlabs.mortar.example.ui.views;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import javax.inject.Inject;
@@ -12,20 +11,21 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import co.lemonlabs.mortar.example.R;
-import co.lemonlabs.mortar.example.ui.screens.StubScreen;
+import co.lemonlabs.mortar.example.ui.misc.FractionalFrameLayout;
+import co.lemonlabs.mortar.example.ui.screens.StubXScreen;
 import co.lemonlabs.mortar.example.ui.views.data.ExamplePopupData;
 import mortar.Mortar;
 import mortar.Popup;
 
-public class StubView extends FrameLayout {
+public class StubXView extends FractionalFrameLayout {
 
-    @Inject StubScreen.Presenter presenter;
+    @Inject StubXScreen.Presenter presenter;
 
     @InjectView(R.id.stub_text) Button textView;
 
     private Popup<ExamplePopupData, Boolean> examplePopup;
 
-    public StubView(Context context, AttributeSet attrs) {
+    public StubXView(Context context, AttributeSet attrs) {
         super(context, attrs);
         Mortar.inject(context, this);
         examplePopup = new ExamplePopup(context);
@@ -46,7 +46,7 @@ public class StubView extends FrameLayout {
 
     @OnClick(R.id.stub_text)
     public void clickStub() {
-        presenter.goToGallery();
+        presenter.goToAnotherStub();
     }
 
     public void setStubText(String text) {

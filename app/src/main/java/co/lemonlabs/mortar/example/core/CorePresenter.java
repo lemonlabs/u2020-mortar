@@ -63,7 +63,7 @@ public class CorePresenter implements Blueprint {
 
         @Override
         protected Blueprint getFirstScreen() {
-            return new GalleryScreen(true);
+            return new GalleryScreen();
         }
 
         @Override protected Blueprint getDrawerScreen() {

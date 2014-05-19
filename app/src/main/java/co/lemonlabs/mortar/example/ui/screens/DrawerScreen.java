@@ -73,13 +73,13 @@ public class DrawerScreen implements Blueprint {
         public void goToScreenAtPosition(int position) {
             switch (position) {
                 case 0:
-                    flow.replaceTo(new GalleryScreen(true));
+                    flow.replaceTo(new GalleryScreen());
                     break;
                 case 1:
                     flow.replaceTo(new NestedScreen());
                     break;
                 default:
-                    flow.replaceTo(new StubScreen(true, position - 1));
+                    flow.replaceTo(new StubXScreen(true, position - 1));
                     break;
             }
         }

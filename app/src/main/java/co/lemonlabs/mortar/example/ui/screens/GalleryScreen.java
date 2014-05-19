@@ -9,6 +9,7 @@ import android.util.SparseArray;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -31,18 +32,12 @@ import flow.Flow;
 import flow.Layout;
 import mortar.ViewPresenter;
 import rx.Subscription;
-import rx.util.functions.Action0;
 
 @Layout(R.layout.gallery_view)
-@Transition({R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right})
+@Transition({R.animator.slide_in_bot, R.animator.slide_out_top, R.animator.slide_in_top, R.animator.slide_out_bot})
 public class GalleryScreen extends TransitionScreen implements StateBlueprint {
 
-    private final boolean                 hasDrawer;
-    private       SparseArray<Parcelable> viewState;
-
-    public GalleryScreen(boolean hasDrawer) {
-        this.hasDrawer = hasDrawer;
-    }
+    private SparseArray<Parcelable> viewState;
 
     @Override
     public String getMortarScopeName() {
@@ -51,7 +46,7 @@ public class GalleryScreen extends TransitionScreen implements StateBlueprint {
 
     @Override
     public Object getDaggerModule() {
-        return new Module(viewState, hasDrawer);
+        return new Module(viewState);
     }
 
     @Override public void setViewState(SparseArray<Parcelable> viewState) {
@@ -67,11 +62,9 @@ public class GalleryScreen extends TransitionScreen implements StateBlueprint {
     public static class Module {
 
         private final SparseArray<Parcelable> viewState;
-        private final boolean                 hasDrawer;
 
-        public Module(SparseArray<Parcelable> viewState, boolean hasDrawer) {
+        public Module(SparseArray<Parcelable> viewState) {
             this.viewState = viewState;
-            this.hasDrawer = hasDrawer;
         }
 
         @Provides GalleryAdapter providesGalleryAdapter(Context context, Picasso picasso) {
@@ -87,10 +80,6 @@ public class GalleryScreen extends TransitionScreen implements StateBlueprint {
             return viewState;
         }
 
-        @Provides boolean providesHasDrawer() { return hasDrawer; }
-
-        ;
-
     }
 
     @Singleton
@@ -104,12 +93,13 @@ public class GalleryScreen extends TransitionScreen implements StateBlueprint {
         private final GalleryAdapter          adapter;
         private final Section                 section;
         private final SparseArray<Parcelable> viewState;
-        private final boolean                 hasDrawer;
 
         private Subscription request;
 
+        private AtomicBoolean transitioning = new AtomicBoolean(false);
+
         @Inject
-        Presenter(ActionBarPresenter actionBar, DrawerPresenter drawer, GalleryDatabase galleryDatabase, Flow flow, GalleryAdapter adapter, Section section, SparseArray<Parcelable> viewState, boolean hasDrawer) {
+        Presenter(ActionBarPresenter actionBar, DrawerPresenter drawer, GalleryDatabase galleryDatabase, Flow flow, GalleryAdapter adapter, Section section, SparseArray<Parcelable> viewState) {
             this.actionBar = actionBar;
             this.drawer = drawer;
             this.galleryDatabase = galleryDatabase;
@@ -117,7 +107,6 @@ public class GalleryScreen extends TransitionScreen implements StateBlueprint {
             this.adapter = adapter;
             this.section = section;
             this.viewState = viewState;
-            this.hasDrawer = hasDrawer;
         }
 
         @Override
@@ -139,19 +128,8 @@ public class GalleryScreen extends TransitionScreen implements StateBlueprint {
                 }
             });
 
-            actionBar.setConfig(new ActionBarPresenter.Config(true, true, "U2020",
-                new ActionBarPresenter.MenuAction("Blaze it", new Action0() {
-                    @Override public void call() {
-                        flow.goTo(new StubScreen(false, 420));
-                    }
-                })
-            ));
-
-            if (hasDrawer) {
-                drawer.setConfig(new DrawerPresenter.Config(true, DrawerLayout.LOCK_MODE_UNLOCKED));
-            } else {
-                drawer.setConfig(new DrawerPresenter.Config(false, DrawerLayout.LOCK_MODE_LOCKED_CLOSED));
-            }
+            actionBar.setConfig(new ActionBarPresenter.Config(true, true, "U2020", null));
+            drawer.setConfig(new DrawerPresenter.Config(true, DrawerLayout.LOCK_MODE_UNLOCKED));
         }
 
         @Override

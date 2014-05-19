@@ -32,6 +32,7 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
     @Inject AppContainer       appContainer;
 
     private ActionBarPresenter.MenuAction actionBarMenuAction;
+    private MenuItem                      menuItem;
     private MortarActivityScope           activityScope;
     private CoreView                      coreView;
     private Flow                          flow;
@@ -82,7 +83,7 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (actionBarMenuAction != null) {
-            menu.add(actionBarMenuAction.title)
+            menuItem = menu.add(actionBarMenuAction.title)
                 .setShowAsActionFlags(SHOW_AS_ACTION_ALWAYS)
                 .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     @Override
@@ -91,6 +92,8 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
                         return true;
                     }
                 });
+        } else if (menu.hasVisibleItems() && menuItem != null){
+            menu.removeItem(menuItem.getItemId());
         }
         return true;
     }

@@ -5,6 +5,9 @@ import android.os.Parcelable;
 import android.support.v4.widget.DrawerLayout;
 import android.util.SparseArray;
 
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -16,7 +19,7 @@ import co.lemonlabs.mortar.example.core.TransitionScreen;
 import co.lemonlabs.mortar.example.core.android.ActionBarPresenter;
 import co.lemonlabs.mortar.example.core.android.DrawerPresenter;
 import co.lemonlabs.mortar.example.core.anim.Transition;
-import co.lemonlabs.mortar.example.ui.views.StubView;
+import co.lemonlabs.mortar.example.ui.views.StubXView;
 import co.lemonlabs.mortar.example.ui.views.data.ExamplePopupData;
 import dagger.Provides;
 import flow.Flow;
@@ -25,13 +28,13 @@ import mortar.PopupPresenter;
 import mortar.ViewPresenter;
 import rx.util.functions.Action0;
 
-@Layout(R.layout.stub)
-@Transition({R.anim.slide_in_bot, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bot})
-public class StubScreen extends TransitionScreen implements StateBlueprint  {
+@Layout(R.layout.stubx)
+@Transition({R.animator.slide_in_right, R.animator.slide_out_left, R.animator.slide_in_left, R.animator.slide_out_right})
+public class StubXScreen extends TransitionScreen implements StateBlueprint  {
 
     private final boolean hasDrawer;
     private final int     position;
-    public StubScreen(boolean hasDrawer, int position) {
+    public StubXScreen(boolean hasDrawer, int position) {
         this.hasDrawer = hasDrawer;
         this.position = position;
     }
@@ -52,7 +55,7 @@ public class StubScreen extends TransitionScreen implements StateBlueprint  {
 
     @dagger.Module(
         injects = {
-            StubView.class
+            StubXView.class
         },
         addsTo = CorePresenter.Module.class,
         library = true
@@ -78,14 +81,16 @@ public class StubScreen extends TransitionScreen implements StateBlueprint  {
     }
 
     @Singleton
-    public static class Presenter extends ViewPresenter<StubView> {
+    public static class Presenter extends ViewPresenter<StubXView> {
 
-        private final Flow flow;
-        private final ActionBarPresenter actionBar;
+        private final Flow                                      flow;
+        private final ActionBarPresenter                        actionBar;
         private final DrawerPresenter                           drawer;
         private final boolean                                   hasDrawer;
         private final String                                    stubText;
         private final PopupPresenter<ExamplePopupData, Boolean> examplePopupPresenter;
+
+        private AtomicBoolean transitioning = new AtomicBoolean();
 
         @Inject
         Presenter(Flow flow, ActionBarPresenter actionBar, DrawerPresenter drawer, @Named("stub") boolean hasDrawer, @Named("stub") String stubText) {
@@ -129,13 +134,15 @@ public class StubScreen extends TransitionScreen implements StateBlueprint  {
         }
 
         @Override
-        public void dropView(StubView view) {
+        public void dropView(StubXView view) {
             examplePopupPresenter.dropView(getView().getExamplePopup());
             super.dropView(view);
         }
 
-        public void goToGallery() {
-            flow.goTo(new GalleryScreen(false));
+        public void goToAnotherStub() {
+            if (!transitioning.getAndSet(true)) {
+                flow.goTo(new StubYScreen(false, new Random().nextInt(420)));
+            }
         }
     }
 }
