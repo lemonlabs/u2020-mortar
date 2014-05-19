@@ -1,44 +1,68 @@
 package co.lemonlabs.mortar.example.core.anim;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.annotation.TargetApi;
 import android.content.Context;
-import android.view.animation.AnimationUtils;
+
+import co.lemonlabs.mortar.example.R;
+import flow.Flow;
 
 /**
- * Responsible for loading transition animations between screens.
+ * Responsible for loading transition animators between screens.
  * Transitions are specified in {@link Transition} annotation.
- * When pushing a new screen Forward, the annotation specifies what animations
- * to run when removing old views and adding new views. Use {@link #pushIn} and
- * {@link #pushOut} for these transactions.
- *
+ * When pushing a new screen Forward, the annotation specifies what animator
+ * to run when removing old views and adding a new view. Use {@link #forward}
+ * for these transactions.
+ * <p/>
  * For moving Backwards transitions must be stored into the screen object and
  * persisted in the backstack because the annotated Screen is no longer accessible
- * due to the way Flow works. Use {@link #popIn} and {@link #popOut} for these
- * transactions using stored transition resources.
+ * due to the way Flow works. Use {@link #backward} for these transactions
+ * using stored transition ids.
  */
+
+@TargetApi(11)
 public final class Transitions {
 
-    public static android.view.animation.Animation pushIn(Context context, Object screen) {
-        return loadTransition(context, screen.getClass(), true);
-    }
+    public static final int NONE = R.animator.empty;
 
-    public static android.view.animation.Animation pushOut(Context context, Object screen) {
-        return loadTransition(context, screen.getClass(), false);
-    }
-
-    public static android.view.animation.Animation popIn(Context context, int[] transitions) {
-        return loadAnimation(context, transitions[2]);
-    }
-
-    public static android.view.animation.Animation popOut(Context context, int[] transitions) {
-        return loadAnimation(context, transitions[3]);
+    public static class Animators {
+        public Animator in;
+        public Animator out;
     }
 
     /**
-     * Create an instance of the animations specified in a {@link Transition} annotation.
+     * Load Animators from {@link Transition} annotation
      */
-    private static android.view.animation.Animation loadTransition(Context context, Class<?> screenType, boolean in) {
+    public static Animators forward(Context context, Object screen) {
+        return loadTransition(context, screen.getClass(), Flow.Direction.FORWARD);
+    }
+
+    /**
+     * Load Animators from stored animator ids in the backstack
+     */
+    public static Animators backward(Context context, int[] transitions) {
+        return createLayoutTransition(context, transitions, Flow.Direction.BACKWARD);
+    }
+
+    /**
+     * Create an instance of the layout transitions specified in a {@link Transition} annotation.
+     */
+    private static Animators loadTransition(Context context, Class<?> screenType, Flow.Direction direction) {
         int[] transitions = getTransitionResources(screenType);
-        return loadAnimation(context, in ? transitions[0] : transitions[1]);
+        return createLayoutTransition(context, transitions, direction);
+    }
+
+    private static Animators createLayoutTransition(Context context, int[] transitionIds, Flow.Direction direction) {
+
+        final boolean forward = direction == Flow.Direction.FORWARD;
+        final int addAnimatorId = forward ? transitionIds[0] : transitionIds[2];
+        final int removeAnimatorId = forward ? transitionIds[1] : transitionIds[3];
+
+        Animators tuple = new Animators();
+        tuple.in = loadAnimator(context, addAnimatorId);
+        tuple.out = loadAnimator(context, removeAnimatorId);
+        return tuple;
     }
 
     /**
@@ -64,11 +88,13 @@ public final class Transitions {
     /**
      * Inflate an animation resource
      */
-    private static android.view.animation.Animation loadAnimation(Context context, int animationId) {
-        return AnimationUtils.loadAnimation(context, animationId);
+    private static Animator loadAnimator(Context context, int animationId) {
+        return AnimatorInflater.loadAnimator(context, animationId);
     }
 
 
     private Transitions() {
     }
+
 }
+
