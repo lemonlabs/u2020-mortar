@@ -15,6 +15,8 @@
  */
 package co.lemonlabs.mortar.example.core.util;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
 import android.content.Context;
 import android.os.Parcelable;
 import android.support.v4.widget.DrawerLayout;
@@ -27,6 +29,7 @@ import butterknife.ButterKnife;
 import co.lemonlabs.mortar.example.R;
 import co.lemonlabs.mortar.example.core.StateBlueprint;
 import co.lemonlabs.mortar.example.core.TransitionScreen;
+import co.lemonlabs.mortar.example.core.anim.SimpleAnimatorListener;
 import co.lemonlabs.mortar.example.core.anim.Transitions;
 import co.lemonlabs.mortar.example.util.Views;
 import flow.Flow;
@@ -51,6 +54,8 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S>, C
     private final Context   context;
     private final ViewGroup container;
 
+    private AnimatorSet screenTransition;
+
     /**
      * @param container the container used to host child views. Typically this is a {@link
      *                  android.widget.FrameLayout} under the action bar. In this case
@@ -62,38 +67,74 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S>, C
         this.container = container;
     }
 
-    public void showScreen(S newScreen, S oldScreen, Flow.Direction direction) {
-        View oldChild = getContentView();
+    public void showScreen(S newScreen, S oldScreen, final Flow.Direction direction) {
+
+        // Cancel previous transition and set end values
+        if (screenTransition != null) {
+            screenTransition.end();
+        }
+
+        final View oldChild = getContentView();
 
         if (destroyOldScope(newScreen, oldChild)) {
             storeViewState(oldChild, oldScreen);
-            View newChild = createNewChildView(newScreen, contentViewId);
+            final View newChild = createNewChildView(newScreen, contentViewId);
 
-
+            Transitions.Animators transitions = null;
             if (oldChild != null) {
                 switch (direction) {
                     case FORWARD:
-                        // Load animations from annotations, store them into backstack and set them to views
+                        // Load animations from Transition annotations, store them into backstack and set them to views
                         storeTransitions(oldScreen, newScreen);
-                        oldChild.setAnimation(Transitions.pushOut(context, newScreen));
-                        newChild.setAnimation(Transitions.pushIn(context, newScreen));
+                        transitions = Transitions.forward(context, newScreen);
                         break;
                     case BACKWARD:
                         if (newScreen instanceof TransitionScreen) {
                             // Try to load animations from a screen and set them
-                            int[] transitions = ((TransitionScreen) newScreen).getTransitions();
-                            newChild.setAnimation(Transitions.popIn(context, transitions));
-                            oldChild.setAnimation(Transitions.popOut(context, transitions));
+                            int[] transitionIds = ((TransitionScreen) newScreen).getTransitions();
+                            transitions = Transitions.backward(context, transitionIds);
                         }
                         break;
                     case REPLACE:
                         // no animations
                         break;
                 }
-
-                container.removeView(oldChild);
             }
+
+            if (oldChild != null) {
+                 // Settings animator for each view and removing the old view
+                 // after animation ends
+                if (transitions != null) {
+                    transitions.out.setTarget(oldChild);
+                    transitions.in.setTarget(newChild);
+                    screenTransition = new AnimatorSet();
+                    screenTransition.playTogether(transitions.out, transitions.in);
+                    screenTransition.addListener(new SimpleAnimatorListener() {
+                        @Override public void onAnimationEnd(Animator animation) {
+                            container.removeView(oldChild);
+                        }
+                    });
+                } else {
+                    // remove view immediately if no transitions to run
+                    container.removeView(oldChild);
+                }
+            }
+
             container.addView(newChild, 0);
+
+            if (screenTransition != null) {
+                screenTransition.start();
+            }
+
+            // Makes the new view z-index higher than the old view
+            // for transitions forward to make feel more natural
+            if (direction == Flow.Direction.FORWARD) {
+                container.post(new Runnable() {
+                    @Override public void run() {
+                        container.bringChildToFront(newChild);
+                    }
+                });
+            }
         }
 
     }
