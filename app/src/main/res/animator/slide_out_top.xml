@@ -1,0 +1,8 @@
+<objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+                android:valueFrom="0"
+                android:valueTo="-1920"
+                android:propertyName="y"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/decelerate_quad"
+                android:duration="@android:integer/config_mediumAnimTime">
+</objectAnimator>
