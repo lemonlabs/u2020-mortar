@@ -9,7 +9,6 @@ import android.util.SparseArray;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -17,10 +16,8 @@ import javax.inject.Singleton;
 import co.lemonlabs.mortar.example.R;
 import co.lemonlabs.mortar.example.core.CorePresenter;
 import co.lemonlabs.mortar.example.core.StateBlueprint;
-import co.lemonlabs.mortar.example.core.TransitionScreen;
 import co.lemonlabs.mortar.example.core.android.ActionBarPresenter;
 import co.lemonlabs.mortar.example.core.android.DrawerPresenter;
-import co.lemonlabs.mortar.example.core.anim.Transition;
 import co.lemonlabs.mortar.example.data.GalleryDatabase;
 import co.lemonlabs.mortar.example.data.api.Section;
 import co.lemonlabs.mortar.example.data.api.model.Image;
@@ -34,8 +31,7 @@ import mortar.ViewPresenter;
 import rx.Subscription;
 
 @Layout(R.layout.gallery_view)
-@Transition({R.animator.slide_in_bot, R.animator.slide_out_top, R.animator.slide_in_top, R.animator.slide_out_bot})
-public class GalleryScreen extends TransitionScreen implements StateBlueprint {
+public class GalleryScreen implements StateBlueprint {
 
     private SparseArray<Parcelable> viewState;
 
@@ -95,8 +91,6 @@ public class GalleryScreen extends TransitionScreen implements StateBlueprint {
         private final SparseArray<Parcelable> viewState;
 
         private Subscription request;
-
-        private AtomicBoolean transitioning = new AtomicBoolean(false);
 
         @Inject
         Presenter(ActionBarPresenter actionBar, DrawerPresenter drawer, GalleryDatabase galleryDatabase, Flow flow, GalleryAdapter adapter, Section section, SparseArray<Parcelable> viewState) {
