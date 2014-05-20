@@ -1,26 +1,30 @@
 package co.lemonlabs.mortar.example.data;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import co.lemonlabs.mortar.example.data.api.GalleryService;
 import co.lemonlabs.mortar.example.data.api.Section;
 import co.lemonlabs.mortar.example.data.api.Sort;
 import co.lemonlabs.mortar.example.data.api.model.Image;
 import co.lemonlabs.mortar.example.data.api.transforms.GalleryToImageList;
 import co.lemonlabs.mortar.example.data.rx.EndObserver;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
-import rx.util.functions.Func1;
+import timber.log.Timber;
 
-/** Poor-man's in-memory cache of responses. Must be accessed on the main thread. */
+/**
+ * Poor-man's in-memory cache of responses. Must be accessed on the main thread.
+ */
 @Singleton
 public class GalleryDatabase {
     private final GalleryService galleryService;
@@ -35,6 +39,7 @@ public class GalleryDatabase {
     // TODO pull underlying logic into a re-usable component for debouncing and caching last value.
     public Subscription loadGallery(final Section section, Observer<List<Image>> observer) {
         List<Image> images = galleryCache.get(section);
+        Timber.i("loadGallery db: " + section + " images: " + (images == null));
         if (images != null) {
             // We have a cached value. Emit it immediately.
             observer.onNext(images);
@@ -53,32 +58,34 @@ public class GalleryDatabase {
 
         galleryRequest.subscribe(new EndObserver<List<Image>>() {
             @Override public void onEnd() {
-        galleryRequests.remove(section);
-      }
+                galleryRequests.remove(section);
+            }
 
-      @Override public void onNext(List<Image> images) {
-        galleryCache.put(section, images);
-      }
-    });
+            @Override public void onNext(List<Image> images) {
+                galleryCache.put(section, images);
+            }
+        });
 
-    // Warning: Gross shit follows! Where you at Java 8?
-    galleryService.listGallery(section, Sort.VIRAL, 1)
-        .map(new GalleryToImageList())
-        .flatMap(new Func1<List<Image>, Observable<Image>>() {
-          @Override public Observable<Image> call(List<Image> images) {
-            return Observable.from(images);
-          }
-        })
-        .filter(new Func1<Image, Boolean>() {
-          @Override public Boolean call(Image image) {
-            return !image.is_album; // No albums.
-          }
-        })
-        .toList()
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(galleryRequest);
+        Timber.i("list gallery plx");
+        // Warning: Gross shit follows! Where you at Java 8?
+        galleryService.listGallery(section, Sort.VIRAL, 1)
+            .map(new GalleryToImageList())
+            .flatMap(new Func1<List<Image>, Observable<Image>>() {
+                @Override public Observable<Image> call(List<Image> images) {
+                    Timber.i("call map with " + images.size());
+                    return Observable.from(images);
+                }
+            })
+            .filter(new Func1<Image, Boolean>() {
+                @Override public Boolean call(Image image) {
+                    return !image.is_album; // No albums.
+                }
+            })
+            .toList()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(galleryRequest);
 
-    return subscription;
-  }
+        return subscription;
+    }
 }

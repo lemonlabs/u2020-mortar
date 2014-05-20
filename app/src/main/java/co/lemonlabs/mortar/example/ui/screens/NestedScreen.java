@@ -13,7 +13,7 @@ import co.lemonlabs.mortar.example.ui.views.NestedView;
 import flow.Layout;
 import mortar.Blueprint;
 import mortar.ViewPresenter;
-import rx.util.functions.Action0;
+import rx.functions.Action0;
 
 @Layout(R.layout.nested)
 public class NestedScreen implements Blueprint {

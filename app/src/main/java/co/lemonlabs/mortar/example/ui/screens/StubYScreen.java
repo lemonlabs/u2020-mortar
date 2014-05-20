@@ -26,7 +26,7 @@ import flow.Flow;
 import flow.Layout;
 import mortar.PopupPresenter;
 import mortar.ViewPresenter;
-import rx.util.functions.Action0;
+import rx.functions.Action0;
 
 @Layout(R.layout.stuby)
 @Transition({R.animator.slide_in_bot, R.animator.empty, R.animator.empty, R.animator.slide_out_bot})

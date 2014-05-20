@@ -1,12 +1,14 @@
 package co.lemonlabs.mortar.example.data.api;
 
 import android.content.SharedPreferences;
+
+import javax.inject.Singleton;
+
 import co.lemonlabs.mortar.example.data.ApiEndpoint;
 import co.lemonlabs.mortar.example.data.IsMockMode;
 import co.lemonlabs.mortar.example.data.prefs.StringPreference;
 import dagger.Module;
 import dagger.Provides;
-import javax.inject.Singleton;
 import retrofit.Endpoint;
 import retrofit.Endpoints;
 import retrofit.MockRestAdapter;
