@@ -46,7 +46,7 @@ public class StubYScreen extends TransitionScreen implements StateBlueprint  {
 
     @Override
     public Object getDaggerModule() {
-        return new Module(hasDrawer, position);
+        return new Module(hasDrawer);
     }
 
     @Override public void setViewState(SparseArray<Parcelable> viewState) {
@@ -64,19 +64,13 @@ public class StubYScreen extends TransitionScreen implements StateBlueprint  {
     public static class Module {
 
         private final boolean hasDrawer;
-        private final int     position;
 
-        public Module(boolean hasDrawer, int position) {
+        public Module(boolean hasDrawer) {
             this.hasDrawer = hasDrawer;
-            this.position = position;
         }
 
         @Provides @Named("stub") boolean providesHasDrawer() {
             return hasDrawer;
-        }
-
-        @Provides @Named("stub") String providesStubText() {
-            return String.format("STUB SCREEN %d", position);
         }
     }
 
@@ -87,18 +81,16 @@ public class StubYScreen extends TransitionScreen implements StateBlueprint  {
         private final ActionBarPresenter                        actionBar;
         private final DrawerPresenter                           drawer;
         private final boolean                                   hasDrawer;
-        private final String                                    stubText;
         private final PopupPresenter<ExamplePopupData, Boolean> examplePopupPresenter;
 
         private AtomicBoolean transitioning = new AtomicBoolean();
 
         @Inject
-        Presenter(Flow flow, ActionBarPresenter actionBar, DrawerPresenter drawer, @Named("stub") boolean hasDrawer, @Named("stub") String stubText) {
+        Presenter(Flow flow, ActionBarPresenter actionBar, DrawerPresenter drawer, @Named("stub") boolean hasDrawer) {
             this.flow = flow;
             this.actionBar = actionBar;
             this.drawer = drawer;
             this.hasDrawer = hasDrawer;
-            this.stubText = stubText;
             this.examplePopupPresenter = new PopupPresenter<ExamplePopupData, Boolean>() {
                 @Override protected void onPopupResult(Boolean confirmed) {
                     Presenter.this.getView().showToast(confirmed ? "Just did that!" : "If you say so...");
@@ -128,7 +120,7 @@ public class StubYScreen extends TransitionScreen implements StateBlueprint  {
                 drawer.setConfig(new DrawerPresenter.Config(true, DrawerLayout.LOCK_MODE_UNLOCKED));
             }
 
-            getView().setStubText(stubText);
+            getView().setStubText(R.string.stub_go_right);
 
             examplePopupPresenter.takeView(getView().getExamplePopup());
         }

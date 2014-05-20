@@ -49,8 +49,8 @@ public class StubXView extends FractionalFrameLayout {
         presenter.goToAnotherStub();
     }
 
-    public void setStubText(String text) {
-        textView.setText(text);
+    public void setStubText(int stringId) {
+        textView.setText(stringId);
     }
 
 

@@ -3,10 +3,12 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="stub_go_right">Go Right!</string>
+    <string name="stub_go_up">Go Upwards!</string>
 
     <array name="drawer_items">
         <item>Gallery</item>
         <item>Nested example</item>
-        <item>Stub Screen</item>
+        <item>Transitions</item>
     </array>
 </resources>
