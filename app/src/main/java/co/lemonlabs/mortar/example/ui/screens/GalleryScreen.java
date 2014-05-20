@@ -29,7 +29,6 @@ import flow.Flow;
 import flow.Layout;
 import mortar.ViewPresenter;
 import rx.Subscription;
-import timber.log.Timber;
 
 @Layout(R.layout.gallery_view)
 public class GalleryScreen implements StateBlueprint {
@@ -113,7 +112,6 @@ public class GalleryScreen implements StateBlueprint {
 
             request = galleryDatabase.loadGallery(section, new EndlessObserver<List<Image>>() {
                 @Override public void onNext(List<Image> images) {
-                    Timber.i("Got list: " + images.size());
                     if (getView() != null) {
                         adapter.replaceWith(images);
                         getView().updateChildId();

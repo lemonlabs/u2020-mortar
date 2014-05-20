@@ -20,7 +20,6 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
-import timber.log.Timber;
 
 /**
  * Poor-man's in-memory cache of responses. Must be accessed on the main thread.
@@ -39,7 +38,6 @@ public class GalleryDatabase {
     // TODO pull underlying logic into a re-usable component for debouncing and caching last value.
     public Subscription loadGallery(final Section section, Observer<List<Image>> observer) {
         List<Image> images = galleryCache.get(section);
-        Timber.i("loadGallery db: " + section + " images: " + (images == null));
         if (images != null) {
             // We have a cached value. Emit it immediately.
             observer.onNext(images);
@@ -66,13 +64,11 @@ public class GalleryDatabase {
             }
         });
 
-        Timber.i("list gallery plx");
         // Warning: Gross shit follows! Where you at Java 8?
         galleryService.listGallery(section, Sort.VIRAL, 1)
             .map(new GalleryToImageList())
             .flatMap(new Func1<List<Image>, Observable<Image>>() {
                 @Override public Observable<Image> call(List<Image> images) {
-                    Timber.i("call map with " + images.size());
                     return Observable.from(images);
                 }
             })
