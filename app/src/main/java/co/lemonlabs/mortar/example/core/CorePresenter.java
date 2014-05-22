@@ -1,5 +1,6 @@
 package co.lemonlabs.mortar.example.core;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 
@@ -18,12 +19,20 @@ import mortar.Blueprint;
 
 public class CorePresenter implements Blueprint {
 
+    /**
+     * Required for a race condition cause by Android when a new scope is created
+     * before the old one is destroyed
+     * <p/>
+     * https://github.com/square/mortar/issues/87#issuecomment-43849264
+     */
+    final int activityTaskId;
 
-    public CorePresenter() {
+    public CorePresenter(Activity activity) {
+        activityTaskId = activity.getTaskId();
     }
 
     @Override public String getMortarScopeName() {
-        return getClass().getName();
+        return getClass().getName() + activityTaskId;
     }
 
     @Override public Object getDaggerModule() {

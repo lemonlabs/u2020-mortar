@@ -42,7 +42,7 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
         super.onCreate(savedInstanceState);
 
         MortarScope parentScope = Mortar.getScope(getApplication());
-        activityScope = Mortar.requireActivityScope(parentScope, new CorePresenter());
+        activityScope = Mortar.requireActivityScope(parentScope, new CorePresenter(this));
         activityScope.onCreate(savedInstanceState);
 
         Mortar.inject(this, this);
