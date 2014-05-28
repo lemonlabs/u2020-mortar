@@ -15,7 +15,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * <li> View to be popped from the backstack</li>
  * </ol>
  *
- * If no animation should be run, use an empty animator:  {@link R.animator.empty}
+ * If no animation should be run, use an empty animator:  {@link Transitions#NONE}
  */
 @Retention(RUNTIME) @Target(TYPE)
 public @interface Transition {

@@ -19,6 +19,7 @@ import co.lemonlabs.mortar.example.core.TransitionScreen;
 import co.lemonlabs.mortar.example.core.android.ActionBarPresenter;
 import co.lemonlabs.mortar.example.core.android.DrawerPresenter;
 import co.lemonlabs.mortar.example.core.anim.Transition;
+import co.lemonlabs.mortar.example.core.anim.Transitions;
 import co.lemonlabs.mortar.example.ui.views.StubYView;
 import co.lemonlabs.mortar.example.ui.views.data.ExamplePopupData;
 import dagger.Provides;
@@ -29,7 +30,7 @@ import mortar.ViewPresenter;
 import rx.functions.Action0;
 
 @Layout(R.layout.stuby)
-@Transition({R.animator.slide_in_bot, R.animator.empty, R.animator.empty, R.animator.slide_out_bot})
+@Transition({R.animator.slide_in_bot, Transitions.NONE, Transitions.NONE, R.animator.slide_out_bot})
 public class StubYScreen extends TransitionScreen implements StateBlueprint  {
 
     private final boolean hasDrawer;
