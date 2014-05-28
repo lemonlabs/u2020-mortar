@@ -132,6 +132,8 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S>, C
                 container.post(new Runnable() {
                     @Override public void run() {
                         container.bringChildToFront(newChild);
+                        container.requestLayout();
+                        container.invalidate();
                     }
                 });
             }
