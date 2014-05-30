@@ -74,7 +74,7 @@ android {
 dependencies {
     compile 'com.android.support:support-v4:19.1.+'
 
-    compile 'com.squareup.mortar:mortar:0.14'
+    compile 'com.squareup.mortar:mortar:0.15'
     compile 'com.squareup.flow:flow:0.7'
     compile 'com.squareup.okhttp:okhttp:1.5.4'
     compile 'com.squareup.picasso:picasso:2.2.0'

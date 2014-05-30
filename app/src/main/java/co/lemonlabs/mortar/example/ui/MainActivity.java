@@ -2,6 +2,7 @@ package co.lemonlabs.mortar.example.ui;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -23,6 +24,8 @@ import mortar.Mortar;
 import mortar.MortarActivityScope;
 import mortar.MortarScope;
 
+import static android.content.Intent.ACTION_MAIN;
+import static android.content.Intent.CATEGORY_LAUNCHER;
 import static android.view.MenuItem.SHOW_AS_ACTION_ALWAYS;
 
 public class MainActivity extends Activity implements ActionBarPresenter.View, DrawerPresenter.View {
@@ -40,6 +43,11 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (isWrongInstance()) {
+            finish();
+            return;
+        }
 
         MortarScope parentScope = Mortar.getScope(getApplication());
         activityScope = Mortar.requireActivityScope(parentScope, new CorePresenter(this));
@@ -75,7 +83,8 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
         actionBarPresenter.dropView(this);
         drawerPresenter.dropView(this);
         if (isFinishing() && activityScope != null) {
-            activityScope.destroy();
+            MortarScope parentScope = Mortar.getScope(getApplication());
+            parentScope.destroyChild(activityScope);
             activityScope = null;
         }
     }
@@ -92,7 +101,7 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
                         return true;
                     }
                 });
-        } else if (menu.hasVisibleItems() && menuItem != null){
+        } else if (menu.hasVisibleItems() && menuItem != null) {
             menu.removeItem(menuItem.getItemId());
         }
         return true;
@@ -168,6 +177,15 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         drawerToggle.syncState();
+    }
+
+    private boolean isWrongInstance() {
+        if (!isTaskRoot()) {
+            Intent intent = getIntent();
+            boolean isMainAction = intent.getAction() != null && intent.getAction().equals(ACTION_MAIN);
+            return intent.hasCategory(CATEGORY_LAUNCHER) && isMainAction;
+        }
+        return false;
     }
 
 }

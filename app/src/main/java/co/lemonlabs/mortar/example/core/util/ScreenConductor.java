@@ -168,12 +168,13 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S>, C
      * if successful
      */
     protected boolean destroyOldScope(S screen, View oldChild) {
+        MortarScope myScope = Mortar.getScope(context);
         if (oldChild != null) {
             MortarScope oldChildScope = Mortar.getScope(oldChild.getContext());
             if (oldChildScope.getName().equals(screen.getMortarScopeName())) {
                 return false;
             }
-            oldChildScope.destroy();
+            myScope.destroyChild(oldChildScope);
         }
         return true;
     }
