@@ -10,6 +10,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 
+import java.util.UUID;
+
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
@@ -41,6 +43,9 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
     private Flow                          flow;
     private ActionBarDrawerToggle         drawerToggle;
 
+    private boolean configurationChangeIncoming;
+    private String  scopeName;
+
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -50,7 +55,7 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
         }
 
         MortarScope parentScope = Mortar.getScope(getApplication());
-        activityScope = Mortar.requireActivityScope(parentScope, new CorePresenter(this));
+        activityScope = Mortar.requireActivityScope(parentScope, new CorePresenter(getScopeName()));
         activityScope.onCreate(savedInstanceState);
 
         Mortar.inject(this, this);
@@ -76,17 +81,28 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
         return super.getSystemService(name);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    @Override public Object onRetainNonConfigurationInstance() {
+        configurationChangeIncoming = true;
+        return activityScope.getName();
+    }
 
+    @Override protected void onDestroy() {
+        super.onDestroy();
         actionBarPresenter.dropView(this);
         drawerPresenter.dropView(this);
-        if (isFinishing() && activityScope != null) {
+        if (!configurationChangeIncoming) {
             MortarScope parentScope = Mortar.getScope(getApplication());
             parentScope.destroyChild(activityScope);
             activityScope = null;
         }
+    }
+
+    private String getScopeName() {
+        if (scopeName == null) scopeName = (String) getLastNonConfigurationInstance();
+        if (scopeName == null) {
+            scopeName = getClass().getName() + "-" + UUID.randomUUID().toString();
+        }
+        return scopeName;
     }
 
     @Override
