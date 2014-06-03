@@ -38,9 +38,8 @@ public class U2020App extends Application {
         registerActivityLifecycleCallbacks(activityHierarchyServer);
     }
 
-    public void buildObjectGraphAndInject() {
+    private void buildObjectGraphAndInject() {
         long start = System.nanoTime();
-
 
         ObjectGraph objectGraph = ObjectGraph.create(Modules.list(this));
         objectGraph.inject(this);
@@ -48,6 +47,11 @@ public class U2020App extends Application {
 
         long diff = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
         Timber.i("Global object graph creation took %sms", diff);
+    }
+
+    public void rebuildOjectGraphAndInject() {
+        Mortar.destroyRootScope(applicationScope);
+        buildObjectGraphAndInject();
     }
 
     @Override
