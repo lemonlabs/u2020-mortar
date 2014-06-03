@@ -90,9 +90,11 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
         super.onDestroy();
         actionBarPresenter.dropView(this);
         drawerPresenter.dropView(this);
-        if (!configurationChangeIncoming && !activityScope.isDestroyed()) {
-            MortarScope parentScope = Mortar.getScope(getApplication());
-            parentScope.destroyChild(activityScope);
+        if (!configurationChangeIncoming) {
+            if(!activityScope.isDestroyed()) {
+                MortarScope parentScope = Mortar.getScope(getApplication());
+                parentScope.destroyChild(activityScope);
+            }
             activityScope = null;
         }
     }
