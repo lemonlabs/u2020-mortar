@@ -19,6 +19,8 @@ public class GalleryView extends BetterViewAnimator {
 
     @Inject GalleryScreen.Presenter presenter;
 
+    private GalleryAdapter adapter;
+
     public GalleryView(Context context, AttributeSet attrs) {
         super(context, attrs);
         Mortar.inject(context, this);
@@ -27,6 +29,8 @@ public class GalleryView extends BetterViewAnimator {
     @Override protected void onFinishInflate() {
         super.onFinishInflate();
         ButterKnife.inject(this);
+        adapter = new GalleryAdapter(getContext(), presenter.getPicasso());
+        setAdapter(adapter);
         presenter.takeView(this);
     }
 
@@ -45,5 +49,9 @@ public class GalleryView extends BetterViewAnimator {
 
     public void updateChildId() {
         setDisplayedChildId(R.id.gallery_grid);
+    }
+
+    public GalleryAdapter getAdapter() {
+        return adapter;
     }
 }
