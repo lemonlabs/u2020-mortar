@@ -76,9 +76,10 @@ dependencies {
 
     compile 'com.squareup.mortar:mortar:0.16'
     compile 'com.squareup.flow:flow:0.7'
-    compile 'com.squareup.okhttp:okhttp:1.5.4'
-    compile 'com.squareup.picasso:picasso:2.2.0'
-    compile 'com.squareup.retrofit:retrofit:1.5.1'
+    compile 'com.squareup.okhttp:okhttp:2.0.0'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
+    compile 'com.squareup.picasso:picasso:2.3.2'
+    compile 'com.squareup.retrofit:retrofit:1.6.0'
 
     compile 'com.netflix.rxjava:rxjava-core:0.17.4'
     compile 'com.netflix.rxjava:rxjava-android:0.17.4'
@@ -90,7 +91,7 @@ dependencies {
 
     compile 'com.etsy.android.grid:library:1.0.3'
 
-    debugCompile 'com.squareup.retrofit:retrofit-mock:1.5.1'
+    debugCompile 'com.squareup.retrofit:retrofit-mock:1.6.0'
     debugCompile 'com.jakewharton.madge:madge:1.1.1'
     debugCompile 'com.jakewharton.scalpel:scalpel:1.1.2'
     debugCompile('com.jakewharton.espresso:espresso:1.1-r3') {
