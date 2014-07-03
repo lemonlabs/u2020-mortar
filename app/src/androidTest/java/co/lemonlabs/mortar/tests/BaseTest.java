@@ -9,18 +9,20 @@ import javax.inject.Inject;
 
 import co.lemonlabs.mortar.example.core.android.ActionBarPresenter;
 import co.lemonlabs.mortar.example.core.android.DrawerPresenter;
-import co.lemonlabs.mortar.example.data.api.MockGalleryService;
+import co.lemonlabs.mortar.example.data.IdlingDownloaderWrapper;
+import co.lemonlabs.mortar.example.data.api.IdlingGalleryServiceWrapper;
 import co.lemonlabs.mortar.example.ui.MainActivity;
 import flow.Flow;
 import retrofit.MockRestAdapter;
 
 public class BaseTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
-    @Inject MockRestAdapter    mockAdapter;
-    @Inject MockGalleryService api;
-    @Inject Flow               flow;
-    @Inject ActionBarPresenter actionBar;
-    @Inject DrawerPresenter    drawer;
+    @Inject MockRestAdapter             mockAdapter;
+    @Inject IdlingDownloaderWrapper     downloader;
+    @Inject IdlingGalleryServiceWrapper api;
+    @Inject Flow                        flow;
+    @Inject ActionBarPresenter          actionBar;
+    @Inject DrawerPresenter             drawer;
 
     protected MainActivity activity;
 
@@ -38,7 +40,7 @@ public class BaseTest extends ActivityInstrumentationTestCase2<MainActivity> {
             .plus(new TestModule())
             .inject(this);
 
-        Espresso.registerIdlingResources(api);
+        Espresso.registerIdlingResources(api, downloader);
 
         mockAdapter.setDelay(50);
         mockAdapter.setErrorPercentage(0);

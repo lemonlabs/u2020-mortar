@@ -26,7 +26,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:0.12.+'
         classpath 'com.jakewharton.hugo:hugo-plugin:1.1.+'
-        classpath 'com.stanfy.spoon:spoon-gradle-plugin:0.9.6'
+        classpath 'com.stanfy.spoon:spoon-gradle-plugin:0.10.+'
     }
 }
 
