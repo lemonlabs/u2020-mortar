@@ -1,5 +1,5 @@
 apply plugin: 'idea'
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 apply plugin: 'spoon'
 apply plugin: 'hugo'
 
@@ -10,8 +10,8 @@ def versionMinor = 0
 def versionPatch = 0
 def versionBuild = 0 // bump for dogfood builds, public betas, etc.
 
-versionCode = versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
-versionName = "${versionMajor}.${versionMinor}.${versionPatch}"
+project.ext.versionCode = versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+project.ext.versionName = "${versionMajor}.${versionMinor}.${versionPatch}"
 
 def gitSha = 'git rev-parse --short HEAD'.execute([], project.rootDir).text.trim()
 def buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'", TimeZone.getTimeZone("UTC"))
@@ -24,7 +24,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.11.+'
+        classpath 'com.android.tools.build:gradle:0.12.+'
         classpath 'com.jakewharton.hugo:hugo-plugin:1.1.+'
         classpath 'com.stanfy.spoon:spoon-gradle-plugin:0.9.6'
     }
@@ -45,7 +45,7 @@ android {
         buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
         buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
 
-        testPackageName "co.lemonlabs.mortar.tests"
+        testApplicationId "co.lemonlabs.mortar.tests"
         testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
 
     }
