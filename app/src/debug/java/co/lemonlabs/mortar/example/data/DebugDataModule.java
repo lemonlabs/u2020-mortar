@@ -2,30 +2,37 @@ package co.lemonlabs.mortar.example.data;
 
 import android.app.Application;
 import android.content.SharedPreferences;
-import co.lemonlabs.mortar.example.data.api.DebugApiModule;
-import co.lemonlabs.mortar.example.data.prefs.BooleanPreference;
-import co.lemonlabs.mortar.example.data.prefs.IntPreference;
-import co.lemonlabs.mortar.example.data.prefs.StringPreference;
+
 import com.squareup.okhttp.OkHttpClient;
+import com.squareup.picasso.Downloader;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
-import dagger.Module;
-import dagger.Provides;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+
 import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
+import co.lemonlabs.mortar.example.data.api.DebugApiModule;
+import co.lemonlabs.mortar.example.data.prefs.BooleanPreference;
+import co.lemonlabs.mortar.example.data.prefs.IntPreference;
+import co.lemonlabs.mortar.example.data.prefs.StringPreference;
+import dagger.Module;
+import dagger.Provides;
 import retrofit.MockRestAdapter;
 
 @Module(
     includes = DebugApiModule.class,
     complete = false,
     library = true,
-    overrides = true
+    overrides = true,
+    injects = {
+        IdlingDownloaderWrapper.class
+    }
 )
 public final class DebugDataModule {
   private static final int DEFAULT_ANIMATION_SPEED = 1; // 1x (normal) speed.
@@ -92,15 +99,23 @@ public final class DebugDataModule {
         DEFAULT_SCALPEL_WIREFRAME_ENABLED);
   }
 
-  @Provides @Singleton Picasso providePicasso(OkHttpClient client, MockRestAdapter mockRestAdapter,
-      @IsMockMode boolean isMockMode, Application app) {
-    Picasso.Builder builder = new Picasso.Builder(app);
-    if (isMockMode) {
-      builder.downloader(new MockDownloader(mockRestAdapter, app.getAssets()));
-    } else {
-      builder.downloader(new OkHttpDownloader(client));
-    }
-    return builder.build();
+  @Provides @Singleton Picasso providePicasso(IdlingDownloaderWrapper downloaderWrapper, Application app) {
+    return new Picasso.Builder(app)
+        .downloader(downloaderWrapper)
+        .build();
+  }
+
+  @Provides @Singleton Downloader provideDownloader(IdlingDownloaderWrapper idlingWrapper) {
+      return idlingWrapper;
+  }
+
+  @Provides @Singleton IdlingDownloaderWrapper provideIdlingDownloaderWrapper(MockRestAdapter mockRestAdapter, Application app,
+                                                                              OkHttpClient client, @IsMockMode boolean isMockMode) {
+      return new IdlingDownloaderWrapper(
+          (isMockMode)
+            ? new MockDownloader(mockRestAdapter, app.getAssets())
+            : new OkHttpDownloader(client)
+      );
   }
 
   private static SSLSocketFactory createBadSslSocketFactory() {

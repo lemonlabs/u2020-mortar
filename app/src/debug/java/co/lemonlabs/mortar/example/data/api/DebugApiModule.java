@@ -1,5 +1,6 @@
 package co.lemonlabs.mortar.example.data.api;
 
+import android.app.Application;
 import android.content.SharedPreferences;
 
 import javax.inject.Singleton;
@@ -35,11 +36,17 @@ public final class DebugApiModule {
   }
 
   @Provides @Singleton
-  GalleryService provideGalleryService(RestAdapter restAdapter, MockRestAdapter mockRestAdapter,
-      @IsMockMode boolean isMockMode, MockGalleryService mockService) {
-    if (isMockMode) {
-      return mockRestAdapter.create(GalleryService.class, mockService);
-    }
-    return restAdapter.create(GalleryService.class);
+  GalleryService provideGalleryService(IdlingGalleryServiceWrapper idlingWrapper) {
+    return idlingWrapper;
+  }
+
+  @Provides @Singleton
+  IdlingGalleryServiceWrapper provideIdlingGalleryServiceWrapper(Application app, RestAdapter restAdapter, MockRestAdapter mockRestAdapter,
+                                                                   @IsMockMode boolean isMockMode, MockGalleryService mockService) {
+    return new IdlingGalleryServiceWrapper(app, (
+      isMockMode
+        ? mockRestAdapter.create(GalleryService.class, mockService)
+        : restAdapter.create(GalleryService.class)
+    ));
   }
 }
