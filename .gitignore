@@ -4,5 +4,6 @@
 .DS_Store
 .idea
 *.iml
+*.apk
 gradle.properties
-
+build/

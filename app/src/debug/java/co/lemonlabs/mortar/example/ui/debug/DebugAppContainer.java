@@ -627,6 +627,6 @@ public class DebugAppContainer implements AppContainer {
     Intent newApp = new Intent(app, MainActivity.class);
     newApp.setFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
     app.startActivity(newApp);
-    app.rebuildOjectGraphAndInject();
+    app.rebuildObjectGraphAndInject();
   }
 }

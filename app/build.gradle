@@ -94,9 +94,7 @@ dependencies {
     debugCompile 'com.squareup.retrofit:retrofit-mock:1.6.0'
     debugCompile 'com.jakewharton.madge:madge:1.1.1'
     debugCompile 'com.jakewharton.scalpel:scalpel:1.1.2'
-    debugCompile('com.jakewharton.espresso:espresso:1.1-r3') {
-        exclude group: 'com.squareup.dagger'
-    }
+    debugCompile 'com.jakewharton.espresso:espresso:1.1-r3'
 
     androidTestCompile 'com.squareup.spoon:spoon-client:1.1.1'
 }
