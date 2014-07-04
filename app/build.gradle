@@ -3,7 +3,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'spoon'
 apply plugin: 'hugo'
 
-
 // Manifest version information!
 def versionMajor = 1
 def versionMinor = 0
@@ -18,17 +17,6 @@ def buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'", TimeZone.getTimeZone(
 
 def isTravis = "true".equals(System.getenv("TRAVIS"))
 def preDexEnabled = "true".equals(System.getProperty("pre-dex", "true"))
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.+'
-        classpath 'com.jakewharton.hugo:hugo-plugin:1.1.+'
-        classpath 'com.stanfy.spoon:spoon-gradle-plugin:0.10.+'
-    }
-}
 
 android {
     compileSdkVersion 19
@@ -69,6 +57,10 @@ android {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
+    }
+
+    lintOptions {
+        abortOnError false
     }
 }
 dependencies {

@@ -1,6 +1,8 @@
 U+2020 mortar
 ============
 
+[![Build Status](https://travis-ci.org/runningcode/u2020-mortar.svg?branch=master)](https://travis-ci.org/runningcode/u2020-mortar)
+
 Port of Jake Wharton's U+2020 sample app with use of Mortar &amp; Flow + couple more examples.
 
 This is more of a kitchen sink of things we are trying with Mortar&Flow. Use as a base for a project at your own risk. Ideas and PRs are welcome.
