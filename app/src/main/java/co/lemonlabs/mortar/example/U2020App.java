@@ -2,6 +2,7 @@ package co.lemonlabs.mortar.example;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.SystemClock;
 
 import java.util.concurrent.TimeUnit;
 
@@ -16,8 +17,6 @@ import timber.log.Timber;
 import static timber.log.Timber.DebugTree;
 
 public class U2020App extends Application {
-
-    public static final String MORTAR_SCOPE = "mortar_scope";
 
     private MortarScope applicationScope;
 
@@ -39,17 +38,17 @@ public class U2020App extends Application {
     }
 
     private void buildObjectGraphAndInject() {
-        long start = System.nanoTime();
+        long start = SystemClock.elapsedRealtime();
 
         ObjectGraph objectGraph = ObjectGraph.create(Modules.list(this));
         objectGraph.inject(this);
         applicationScope = Mortar.createRootScope(BuildConfig.DEBUG, objectGraph);
 
-        long diff = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+        long diff = TimeUnit.NANOSECONDS.toMillis(SystemClock.elapsedRealtime() - start);
         Timber.i("Global object graph creation took %sms", diff);
     }
 
-    public void rebuildOjectGraphAndInject() {
+    public void rebuildObjectGraphAndInject() {
         Mortar.destroyRootScope(applicationScope);
         buildObjectGraphAndInject();
     }
