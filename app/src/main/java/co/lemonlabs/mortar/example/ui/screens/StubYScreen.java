@@ -1,9 +1,8 @@
 package co.lemonlabs.mortar.example.ui.screens;
 
 import android.os.Bundle;
-import android.os.Parcelable;
+import android.os.Parcel;
 import android.support.v4.widget.DrawerLayout;
-import android.util.SparseArray;
 
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -14,7 +13,6 @@ import javax.inject.Singleton;
 
 import co.lemonlabs.mortar.example.R;
 import co.lemonlabs.mortar.example.core.CorePresenter;
-import co.lemonlabs.mortar.example.core.StateBlueprint;
 import co.lemonlabs.mortar.example.core.TransitionScreen;
 import co.lemonlabs.mortar.example.core.android.ActionBarPresenter;
 import co.lemonlabs.mortar.example.core.android.DrawerPresenter;
@@ -31,10 +29,11 @@ import rx.functions.Action0;
 
 @Layout(R.layout.stuby)
 @Transition({R.animator.slide_in_bot, Transitions.NONE, Transitions.NONE, R.animator.slide_out_bot})
-public class StubYScreen extends TransitionScreen implements StateBlueprint  {
+public class StubYScreen extends TransitionScreen {
 
     private final boolean hasDrawer;
     private final int     position;
+
     public StubYScreen(boolean hasDrawer, int position) {
         this.hasDrawer = hasDrawer;
         this.position = position;
@@ -50,9 +49,23 @@ public class StubYScreen extends TransitionScreen implements StateBlueprint  {
         return new Module(hasDrawer);
     }
 
-    @Override public void setViewState(SparseArray<Parcelable> viewState) {
-        // no view state to be stored
+    @Override
+    protected void doWriteToParcel(Parcel parcel, int flags) {
+        parcel.writeByte((byte) (hasDrawer ? 1 : 0));
+        parcel.writeInt(position);
     }
+
+    public static final Creator<StubYScreen> CREATOR = new ScreenCreator<StubYScreen>() {
+        @Override protected StubYScreen doCreateFromParcel(Parcel source) {
+            boolean hasDrawer = source.readByte() != 0;
+            int position = source.readInt();
+            return new StubYScreen(hasDrawer, position);
+        }
+
+        @Override public StubYScreen[] newArray(int size) {
+            return new StubYScreen[size];
+        }
+    };
 
     @dagger.Module(
         injects = {

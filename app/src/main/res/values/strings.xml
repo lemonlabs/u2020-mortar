@@ -7,10 +7,12 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="stub_go_right">Go Right!</string>
     <string name="stub_go_up">Go Upwards!</string>
+    <string name="view_state_hint">Enter text to be preserved</string>
 
     <array name="drawer_items">
         <item>Gallery</item>
         <item>Nested example</item>
         <item>Transitions</item>
+        <item>View State example</item>
     </array>
 </resources>

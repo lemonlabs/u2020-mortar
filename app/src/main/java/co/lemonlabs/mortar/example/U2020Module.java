@@ -8,7 +8,7 @@ import com.google.gson.GsonBuilder;
 import javax.inject.Singleton;
 
 import co.lemonlabs.mortar.example.core.android.AndroidModule;
-import co.lemonlabs.mortar.example.core.util.GsonParcer;
+import co.lemonlabs.mortar.example.core.util.ScreenParcer;
 import co.lemonlabs.mortar.example.data.DataModule;
 import co.lemonlabs.mortar.example.ui.UiModule;
 import dagger.Module;
@@ -42,7 +42,7 @@ public final class U2020Module {
             .create();
     }
 
-    @Provides @Singleton Parcer<Object> provideParcer(Gson gson) {
-        return new GsonParcer<>(gson);
+    @Provides @Singleton Parcer<Object> provideParcer() {
+        return new ScreenParcer<>();
     }
 }

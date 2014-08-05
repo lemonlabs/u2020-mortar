@@ -78,8 +78,11 @@ public class DrawerScreen implements Blueprint {
                 case 1:
                     flow.replaceTo(new NestedScreen());
                     break;
-                default:
+                case 2:
                     flow.replaceTo(new StubXScreen(true, position - 1));
+                    break;
+                case 3:
+                    flow.replaceTo(new ViewStateScreen(1));
                     break;
             }
         }
