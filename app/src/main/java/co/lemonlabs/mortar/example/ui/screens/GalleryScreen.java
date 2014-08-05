@@ -1,6 +1,7 @@
 package co.lemonlabs.mortar.example.ui.screens;
 
 import android.os.Bundle;
+import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v4.widget.DrawerLayout;
 import android.util.SparseArray;
@@ -14,24 +15,24 @@ import javax.inject.Singleton;
 
 import co.lemonlabs.mortar.example.R;
 import co.lemonlabs.mortar.example.core.CorePresenter;
-import co.lemonlabs.mortar.example.core.StateBlueprint;
+import co.lemonlabs.mortar.example.core.TransitionScreen;
 import co.lemonlabs.mortar.example.core.android.ActionBarPresenter;
 import co.lemonlabs.mortar.example.core.android.DrawerPresenter;
+import co.lemonlabs.mortar.example.core.anim.Transition;
+import co.lemonlabs.mortar.example.core.anim.Transitions;
 import co.lemonlabs.mortar.example.data.GalleryDatabase;
 import co.lemonlabs.mortar.example.data.api.Section;
 import co.lemonlabs.mortar.example.data.api.model.Image;
 import co.lemonlabs.mortar.example.data.rx.EndlessObserver;
 import co.lemonlabs.mortar.example.ui.views.GalleryView;
 import dagger.Provides;
-import flow.Flow;
 import flow.Layout;
 import mortar.ViewPresenter;
 import rx.Subscription;
 
 @Layout(R.layout.gallery_view)
-public class GalleryScreen implements StateBlueprint {
-
-    private SparseArray<Parcelable> viewState;
+@Transition({Transitions.NONE, Transitions.NONE, Transitions.NONE, Transitions.NONE})
+public class GalleryScreen extends TransitionScreen {
 
     @Override
     public String getMortarScopeName() {
@@ -40,12 +41,18 @@ public class GalleryScreen implements StateBlueprint {
 
     @Override
     public Object getDaggerModule() {
-        return new Module(viewState);
+        return new Module(getViewState());
     }
 
-    @Override public void setViewState(SparseArray<Parcelable> viewState) {
-        this.viewState = viewState;
-    }
+    public static final Creator<GalleryScreen> CREATOR = new ScreenCreator<GalleryScreen>() {
+        @Override protected GalleryScreen doCreateFromParcel(Parcel source) {
+            return new GalleryScreen();
+        }
+
+        @Override public GalleryScreen[] newArray(int size) {
+            return new GalleryScreen[size];
+        }
+    };
 
     @dagger.Module(
         injects = GalleryView.class,
@@ -65,7 +72,6 @@ public class GalleryScreen implements StateBlueprint {
             return Section.HOT;
         }
 
-
         @Provides SparseArray<Parcelable> provideViewState() {
             return viewState;
         }
@@ -78,7 +84,6 @@ public class GalleryScreen implements StateBlueprint {
         private final ActionBarPresenter      actionBar;
         private final DrawerPresenter         drawer;
         private final GalleryDatabase         galleryDatabase;
-        private final Flow                    flow;
         private final Picasso                 picasso;
         private final Section                 section;
         private final SparseArray<Parcelable> viewState;
@@ -86,11 +91,10 @@ public class GalleryScreen implements StateBlueprint {
         private Subscription request;
 
         @Inject
-        Presenter(ActionBarPresenter actionBar, DrawerPresenter drawer, GalleryDatabase galleryDatabase, Flow flow, Picasso picasso, Section section, SparseArray<Parcelable> viewState) {
+        Presenter(ActionBarPresenter actionBar, DrawerPresenter drawer, GalleryDatabase galleryDatabase, Picasso picasso, Section section, SparseArray<Parcelable> viewState) {
             this.actionBar = actionBar;
             this.drawer = drawer;
             this.galleryDatabase = galleryDatabase;
-            this.flow = flow;
             this.picasso = picasso;
             this.section = section;
             this.viewState = viewState;

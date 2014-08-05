@@ -27,7 +27,6 @@ import android.view.ViewGroup;
 
 import butterknife.ButterKnife;
 import co.lemonlabs.mortar.example.R;
-import co.lemonlabs.mortar.example.core.StateBlueprint;
 import co.lemonlabs.mortar.example.core.TransitionScreen;
 import co.lemonlabs.mortar.example.core.anim.SimpleAnimatorListener;
 import co.lemonlabs.mortar.example.core.anim.Transitions;
@@ -37,6 +36,7 @@ import flow.Layouts;
 import mortar.Blueprint;
 import mortar.Mortar;
 import mortar.MortarScope;
+import timber.log.Timber;
 
 /**
  * A conductor that can swap subviews within a container view.
@@ -196,10 +196,11 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S>, C
      * the backstack of Flow
      */
     protected void storeViewState(View view, S screen) {
-        if (screen != null && screen instanceof StateBlueprint) {
+        if (screen != null && screen instanceof TransitionScreen) {
             SparseArray<Parcelable> state = new SparseArray<>();
             view.saveHierarchyState(state);
-            ((StateBlueprint) screen).setViewState(state);
+            ((TransitionScreen) screen).setViewState(state);
+            Timber.i("Storing view state %s", state);
         }
     }
 

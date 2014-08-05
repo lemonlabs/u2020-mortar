@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<co.lemonlabs.mortar.example.ui.views.ViewStateView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/holo_orange_light">
+
+    <EditText
+        android:id="@+id/must_provide_id_to_store_state"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="24dp"
+        android:hint="@string/view_state_hint"/>
+
+</co.lemonlabs.mortar.example.ui.views.ViewStateView>
