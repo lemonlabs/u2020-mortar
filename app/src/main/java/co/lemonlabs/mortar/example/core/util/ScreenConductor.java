@@ -187,7 +187,8 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S>, C
         MortarScope newChildScope = myScope.requireChild(screen);
         Context childContext = newChildScope.createContext(context);
         View newChild = Layouts.createView(childContext, screen);
-        newChild.setId(viewId);
+        if (newChild.getId() == View.NO_ID)
+            newChild.setId(viewId);
         return newChild;
     }
 
