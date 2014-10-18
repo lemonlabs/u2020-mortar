@@ -11,6 +11,7 @@ import android.widget.ListView;
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
+import co.lemonlabs.mortar.example.R;
 import co.lemonlabs.mortar.example.core.CoreView;
 import co.lemonlabs.mortar.example.ui.screens.DrawerScreen;
 import mortar.Mortar;
@@ -56,9 +57,12 @@ public class DrawerView extends ListView {
         presenter.dropView(this);
     }
 
-    public void setListAdapter(ArrayAdapter<String> adapter) {
-        setAdapter(adapter);
-        setItemChecked(mCurrentSelectedPosition, true);
+    public void setListAdapter() {
+        setAdapter(new ArrayAdapter<>(
+            getContext(),
+            android.R.layout.simple_list_item_activated_1,
+            android.R.id.text1,
+            getContext().getResources().getStringArray(R.array.drawer_items)
+        ));
     }
-
 }
