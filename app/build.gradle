@@ -24,19 +24,19 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.+'
+        classpath 'com.android.tools.build:gradle:0.14.1'
         classpath 'com.jakewharton.hugo:hugo-plugin:1.1.+'
         classpath 'com.stanfy.spoon:spoon-gradle-plugin:0.10.+'
     }
 }
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "19.1.0"
+    compileSdkVersion 20
+    buildToolsVersion "20.0.0"
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 19
+        targetSdkVersion 20
 
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
@@ -72,7 +72,7 @@ android {
     }
 }
 dependencies {
-    compile 'com.android.support:support-v4:19.1.+'
+    compile 'com.android.support:support-v4:20.0.+'
 
     compile 'com.squareup.mortar:mortar:0.16'
     compile 'com.squareup.flow:flow:0.7'
