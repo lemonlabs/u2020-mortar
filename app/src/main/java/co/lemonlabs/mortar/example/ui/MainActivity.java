@@ -3,6 +3,8 @@ package co.lemonlabs.mortar.example.ui;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -10,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -20,21 +23,25 @@ import co.lemonlabs.mortar.example.U2020App;
 import co.lemonlabs.mortar.example.core.CorePresenter;
 import co.lemonlabs.mortar.example.core.CoreView;
 import co.lemonlabs.mortar.example.core.android.ActionBarPresenter;
+import co.lemonlabs.mortar.example.core.android.ActivityResultPresenter;
 import co.lemonlabs.mortar.example.core.android.DrawerPresenter;
 import flow.Flow;
 import mortar.Mortar;
 import mortar.MortarActivityScope;
 import mortar.MortarScope;
+import timber.log.Timber;
 
 import static android.content.Intent.ACTION_MAIN;
 import static android.content.Intent.CATEGORY_LAUNCHER;
 import static android.view.MenuItem.SHOW_AS_ACTION_ALWAYS;
 
-public class MainActivity extends Activity implements ActionBarPresenter.View, DrawerPresenter.View {
+public class MainActivity extends Activity implements ActionBarPresenter.View, DrawerPresenter.View,
+    ActivityResultPresenter.View {
 
-    @Inject ActionBarPresenter actionBarPresenter;
-    @Inject DrawerPresenter    drawerPresenter;
-    @Inject AppContainer       appContainer;
+    @Inject ActionBarPresenter      actionBarPresenter;
+    @Inject DrawerPresenter         drawerPresenter;
+    @Inject ActivityResultPresenter activityResultPresenter;
+    @Inject AppContainer            appContainer;
 
     private ActionBarPresenter.MenuAction actionBarMenuAction;
     private MenuItem                      menuItem;
@@ -71,6 +78,7 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
 
         drawerToggle = coreView.getDrawerToggle();
         drawerPresenter.takeView(this);
+        activityResultPresenter.takeView(this);
     }
 
     @Override
@@ -88,8 +96,9 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
 
     @Override protected void onDestroy() {
         super.onDestroy();
-        if (actionBarPresenter != null) actionBarPresenter.dropView(this);
-        if (drawerPresenter != null) drawerPresenter.dropView(this);
+        actionBarPresenter.dropView(this);
+        drawerPresenter.dropView(this);
+        activityResultPresenter.dropView(this);
         if (!configurationChangeIncoming) {
             if (!activityScope.isDestroyed()) {
                 MortarScope parentScope = Mortar.getScope(getApplication());
@@ -160,6 +169,22 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
         return activityScope;
     }
 
+    @Override public void startActivity(Intent intent) {
+        if (canHandleIntent(intent)) {
+            startActivity(intent);
+        } else {
+            Timber.e("Could not handle intent %s... ignoring", intent);
+        }
+    }
+
+    @Override public void startActivityForResult(int requestCode, Intent intent) {
+        if (canHandleIntent(intent)) {
+            startActivityForResult(intent, requestCode);
+        } else {
+            Timber.e("Could not handle intent %s... ignoring", intent);
+        }
+    }
+
     @Override
     public void setDrawerIndicatorEnabled(boolean enabled) {
         drawerToggle.setDrawerIndicatorEnabled(enabled);
@@ -197,6 +222,11 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
         drawerToggle.syncState();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        activityResultPresenter.onActivityResultReceived(requestCode, resultCode, data);
+    }
+
     private boolean isWrongInstance() {
         if (!isTaskRoot()) {
             Intent intent = getIntent();
@@ -206,4 +236,9 @@ public class MainActivity extends Activity implements ActionBarPresenter.View, D
         return false;
     }
 
+    private boolean canHandleIntent(Intent intent) {
+        PackageManager manager = getPackageManager();
+        List<ResolveInfo> info = manager.queryIntentActivities(intent, 0);
+        return info.size() > 0;
+    }
 }

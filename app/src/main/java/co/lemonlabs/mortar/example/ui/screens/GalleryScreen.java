@@ -1,5 +1,7 @@
 package co.lemonlabs.mortar.example.ui.screens;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -17,6 +19,8 @@ import co.lemonlabs.mortar.example.R;
 import co.lemonlabs.mortar.example.core.CorePresenter;
 import co.lemonlabs.mortar.example.core.TransitionScreen;
 import co.lemonlabs.mortar.example.core.android.ActionBarPresenter;
+import co.lemonlabs.mortar.example.core.android.ActivityResultPresenter;
+import co.lemonlabs.mortar.example.core.android.ActivityResultRegistrar;
 import co.lemonlabs.mortar.example.core.android.DrawerPresenter;
 import co.lemonlabs.mortar.example.core.anim.Transition;
 import co.lemonlabs.mortar.example.core.anim.Transitions;
@@ -27,8 +31,13 @@ import co.lemonlabs.mortar.example.data.rx.EndlessObserver;
 import co.lemonlabs.mortar.example.ui.views.GalleryView;
 import dagger.Provides;
 import flow.Layout;
+import mortar.MortarScope;
 import mortar.ViewPresenter;
 import rx.Subscription;
+import rx.functions.Action0;
+import timber.log.Timber;
+
+import static android.provider.ContactsContract.CommonDataKinds.Phone;
 
 @Layout(R.layout.gallery_view)
 @Transition({Transitions.NONE, Transitions.NONE, Transitions.NONE, Transitions.NONE})
@@ -79,29 +88,40 @@ public class GalleryScreen extends TransitionScreen {
     }
 
     @Singleton
-    public static class Presenter extends ViewPresenter<GalleryView> {
+    public static class Presenter extends ViewPresenter<GalleryView>
+        implements ActivityResultPresenter.ActivityResultListener {
+
+        private static final int PICK_CONTACT_REQUEST = 1;
 
         private final ActionBarPresenter      actionBar;
         private final DrawerPresenter         drawer;
         private final GalleryDatabase         galleryDatabase;
         private final Picasso                 picasso;
         private final Section                 section;
+        private final ActivityResultRegistrar activityResultRegistrar;
         private final SparseArray<Parcelable> viewState;
 
         private Subscription request;
 
-        @Inject
-        Presenter(ActionBarPresenter actionBar, DrawerPresenter drawer, GalleryDatabase galleryDatabase, Picasso picasso, Section section, SparseArray<Parcelable> viewState) {
+        @Inject Presenter(
+            ActionBarPresenter actionBar,
+            DrawerPresenter drawer,
+            GalleryDatabase galleryDatabase,
+            Picasso picasso,
+            Section section,
+            ActivityResultRegistrar activityResultRegistrar,
+            SparseArray<Parcelable> viewState
+        ) {
             this.actionBar = actionBar;
             this.drawer = drawer;
             this.galleryDatabase = galleryDatabase;
             this.picasso = picasso;
             this.section = section;
+            this.activityResultRegistrar = activityResultRegistrar;
             this.viewState = viewState;
         }
 
-        @Override
-        public void onLoad(Bundle savedInstanceState) {
+        @Override public void onLoad(Bundle savedInstanceState) {
             super.onLoad(savedInstanceState);
             if (getView() == null) return;
 
@@ -117,14 +137,35 @@ public class GalleryScreen extends TransitionScreen {
                 }
             });
 
-            actionBar.setConfig(new ActionBarPresenter.Config(true, true, "U2020", null));
+            actionBar.setConfig(new ActionBarPresenter.Config(
+                true, true, "U2020",
+                new ActionBarPresenter.MenuAction("Pick contact", new Action0() {
+                    @Override public void call() {
+                        Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
+                        pickContactIntent.setType(Phone.CONTENT_TYPE);
+                        activityResultRegistrar.startActivityForResult(PICK_CONTACT_REQUEST, pickContactIntent);
+                    }
+                })
+            ));
             drawer.setConfig(new DrawerPresenter.Config(true, DrawerLayout.LOCK_MODE_UNLOCKED));
         }
 
-        @Override
-        public void dropView(GalleryView view) {
+        @Override public void onEnterScope(MortarScope scope) {
+            super.onEnterScope(scope);
+            activityResultRegistrar.register(scope, this);
+        }
+
+        @Override public void dropView(GalleryView view) {
             request.unsubscribe();
             super.dropView(view);
+        }
+
+        @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            Timber.i("request code: %s, result code: %s", requestCode, resultCode);
+            if (data != null) {
+                Timber.i("Got data: %s", data.getData());
+                // do something with data
+            }
         }
 
         public Picasso getPicasso() {
